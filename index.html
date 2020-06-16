@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>BridgeBot Replay Viewer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+    type="text/javascript">
+    </script>
+    <!-- Bootstrap 4.5.0 -->
+    <link rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <!-- BridgeBot stylesheet -->
+    <link rel="stylesheet" type="text/css" href="bridgebot.css">
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js">
+    </script>
+  </head>
+  <body>
+    <div>
+      <h1>Bridgebot Replay Viewer</h1>
+      <form method="post">
+        <label for="gamecode">Enter code here:</label>
+        <br>
+        <input type="text" id="gamecode" name="gamecode" />
+        <br>
+        <input type="submit" value="Simulate" />
+      </form>
+    </div>
+    <span id="valid"></span>
+    <br>
+    <span id="bid" class="replay"></span>
+    <br>
+    <div id="hands" class="replay"></div>
+    <br>
+    <div id="plays" class="replay"></div>
+    <br>
+    <div id="outcome" class="replay"></div>
+    <!-- replay.js - backend execution -->
+    <script type="text/javascript" src="replay.js"></script>
+  </body>
+</html>
