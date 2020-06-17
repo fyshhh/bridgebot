@@ -10,18 +10,24 @@ To Do:
 3) UI improvements.
 
 Changelog:
-140620: Created site and code parsing for play order.
-150620: Added replay (very basic, shows all tricks and cards played)
-160620: Added hand viewing and tracking support.
+140620: Created site and code parsing for play order. (6h)
+150620: Added replay (very basic, shows all tricks and cards played) (6h)
+160620: Added hand viewing and tracking and partner support. (6h)
+170620: Added bid and partner parsing, as well as proper code validation. (6h)
 */
 
-// use this code: b0abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
+// use this code: b0b0abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
 
 "use strict";
 
 var bid,
+    bids = [],
     input,
+    inputA,
     bidder,
+    bidCode,
+    partCode,
+    playCode,
     partnerC,
     partnerP,
     tricks = [],
@@ -31,6 +37,7 @@ var bid,
 function Bid(num, suit) {
     this.num = num;
     this.suit = suit;
+    this.player = null;
     this.string = function () {
         return this.num + this.suit;
     };
@@ -118,6 +125,30 @@ function Trick(card1, card2, card3, card4) {
     };
 }
 
+function charToBid(char) {
+    var num,
+        suit,
+        temp = char;
+    if (temp > 90) {
+        temp -= 6;
+    }
+    temp -= 64;
+    num = Math.ceil(temp / 5);
+    suit = temp % 5;
+    if (suit === 1) {
+        suit = "C";
+    } else if (suit === 2) {
+        suit = "D";
+    } else if (suit === 3) {
+        suit = "H";
+    } else if (suit === 4) {
+        suit = "S";
+    } else {
+        suit = "NT";
+    }
+    return new Bid(num, suit);
+}
+
 function charToCard(char) {
     var suit = "",
         num = char;
@@ -137,12 +168,37 @@ function charToCard(char) {
     return new Card(num, suit);
 }
 
-function isValid() {
+function validate() {
     var i;
-    for (i = 0; i < input.length; i += 1) {
-        if (input.indexOf(input[i]) !== input.lastIndexOf(input[i]) ||
-                !((input[i].charCodeAt() > 64 && input[i].charCodeAt() < 91) ||
-                    (input[i].charCodeAt() > 96 && input[i].charCodeAt() < 123))) {
+    if (input.length < 56 ||
+            (input.charAt(input.length - 53) !== "-" &&
+            input.charAt(input.length - 55) !== "-")) {
+        return false;
+    }
+    inputA = input.split("-");
+    bidCode = inputA[0];
+    partCode = inputA[1];
+    playCode = inputA[2];
+    if (bidCode[0].charCodeAt() < 48 || bidCode[0].charCodeAt() > 51) {
+        return false;
+    }
+    for (i = 1; i < bidCode.length; i += 1) {
+        if (bidCode[i].charCodeAt() === 122 &&
+                (bidCode.indexOf(bidCode[i]) !== bidCode.lastIndexOf(bidCode[i]) ||
+                !((bidCode[i].charCodeAt() > 64 && bidCode[i].charCodeAt() < 91) ||
+                    (bidCode[i].charCodeAt() > 96 && bidCode[i].charCodeAt() < 105)))) {
+            return false;
+        }
+    }
+    if (partCode.length !== 1 ||
+            !((partCode.charCodeAt() > 64 && partCode.charCodeAt() < 91) ||
+                (partCode.charCodeAt() > 96 && partCode.charCodeAt() < 123))) {
+        return false;
+    }
+    for (i = 0; i < playCode.length; i += 1) {
+        if (playCode.indexOf(playCode[i]) !== playCode.lastIndexOf(playCode[i]) ||
+                !((playCode[i].charCodeAt() > 64 && playCode[i].charCodeAt() < 91) ||
+                    (playCode[i].charCodeAt() > 96 && playCode[i].charCodeAt() < 123))) {
             return false;
         }
     }
@@ -151,18 +207,38 @@ function isValid() {
 
 function simulate() {
     var i,
-        x;
-    bid = new Bid(1, "S");
-    bidder = 0;
+        x,
+        curr,
+        init = parseInt(bidCode[0], 10);
+    bids = [];
+    for (i = 1; i < bidCode.length; i += 1) {
+        curr = charToBid(bidCode[i].charCodeAt());
+        curr.player = init;
+        init = (init + 1) % 4;
+        bids.push(curr);
+    }
+    bid = bids[bids.length - 1];
+    bidder = bid.player;
     x = bidder;
-    partnerC = charToCard(110);
+    points = [0, 0, 0, 0];
+    partnerC = charToCard(partCode.charCodeAt(0));
     for (i = 0; i < 13; i += 1) {
-        tricks[i] = new Trick(charToCard(input.charCodeAt(4 * i)),
-            charToCard(input.charCodeAt(4 * i + 1)),
-            charToCard(input.charCodeAt(4 * i + 2)),
-            charToCard(input.charCodeAt(4 * i + 3)));
+        tricks[i] = new Trick(charToCard(playCode.charCodeAt(4 * i)),
+            charToCard(playCode.charCodeAt(4 * i + 1)),
+            charToCard(playCode.charCodeAt(4 * i + 2)),
+            charToCard(playCode.charCodeAt(4 * i + 3)));
         x = tricks[i].parse(x);
     }
+}
+
+function stringifyBids() {
+    var i,
+        str;
+    str = "Bid order:<br>";
+    for (i = 0; i < bids.length; i += 1) {
+        str += bids[i].string() + " by " + numToPlayer(bids[i].player) + "<br>";
+    }
+    return str;
 }
 
 function computeHand(index) {
@@ -221,13 +297,14 @@ function stringifyOutcome() {
 
 $("form").submit(function (event) {
     input = $("#gamecode").val();
-    if (isValid()) {
+    if (validate()) {
         simulate();
         $("#valid").html("Valid code: " + input).show();
-        $("#bid").html("Winning bid is " + bid.string() +
-             " by " + numToPlayer(bidder) + "(" + bid.tricks() +
+        $("#bid_win").html("Winning bid is " + bid.string() +
+             " by " + numToPlayer(bidder) + " (" + bid.tricks() +
              " tricks required). Partner card is " +
              partnerC.string() + ".").show();
+        $("#bid_gen").html(stringifyBids()).show();
         $("#hands").html(stringifyHand()).show();
         $("#plays").html(stringifyPlay()).show();
         $("#outcome").html(stringifyOutcome()).show();
