@@ -5,15 +5,19 @@
 
 /*
 To Do:
-1) Add card replay support (turn by turn).
-2) Add bidding support.
-3) UI improvements.
+1) Add card replay support (turn by turn, may require splitting html elements).
+2) UI improvements (look into pictures/animations).
+3) Add advanced options (show/hide all hands, show/hide results).
 
 Changelog:
 140620: Created site and code parsing for play order. (6h)
 150620: Added replay (very basic, shows all tricks and cards played) (6h)
 160620: Added hand viewing and tracking and partner support. (6h)
 170620: Added bid and partner parsing, as well as proper code validation. (6h)
+180620: Added pass support (2h).
+
+Known bugs:
+1) Cannot support prematurely ended games (rework parsing to player by player instead of trick by trick).
 */
 
 // use this code: b0b0abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
@@ -39,7 +43,9 @@ function Bid(num, suit) {
     this.suit = suit;
     this.player = null;
     this.string = function () {
-        return this.num + this.suit;
+        return suit === "P"
+            ? "Pass"
+            : this.num + this.suit;
     };
     this.tricks = function () {
         return this.num + 6;
@@ -129,6 +135,9 @@ function charToBid(char) {
     var num,
         suit,
         temp = char;
+    if (temp === 122) {
+        return new Bid(0, "P");
+    }
     if (temp > 90) {
         temp -= 6;
     }
@@ -183,7 +192,7 @@ function validate() {
         return false;
     }
     for (i = 1; i < bidCode.length; i += 1) {
-        if (bidCode[i].charCodeAt() === 122 &&
+        if (bidCode[i].charCodeAt() !== 122 &&
                 (bidCode.indexOf(bidCode[i]) !== bidCode.lastIndexOf(bidCode[i]) ||
                 !((bidCode[i].charCodeAt() > 64 && bidCode[i].charCodeAt() < 91) ||
                     (bidCode[i].charCodeAt() > 96 && bidCode[i].charCodeAt() < 105)))) {
@@ -282,10 +291,14 @@ function stringifyOutcome() {
         pair2,
         str,
         temp = [0, 1, 2, 3];
-    pair1 = numToPlayer(bidder) + "-" + numToPlayer(partnerP);
+    pair1 = bidder === 1 && partnerP === 2
+        ? numToPlayer(partnerP) + "-" + numToPlayer(bidder)
+        : numToPlayer(bidder) + "-" + numToPlayer(partnerP);
     remove(temp, bidder);
     remove(temp, partnerP);
-    pair2 = numToPlayer(temp[0]) + "-" + numToPlayer(temp[1]);
+    pair2 = temp[0] === 1 && temp[1] === 2
+        ? numToPlayer(temp[1]) + "-" + numToPlayer(temp[0])
+        : numToPlayer(temp[0]) + "-" + numToPlayer(temp[1]);
     str = "Partners are " + pair1 + " (bidders) and " + pair2 + ".<br>" +
         pair1 + " took " + (points[bidder] + points[partnerP]) +
         " tricks and " + pair2 + " took " +
@@ -299,16 +312,18 @@ $("form").submit(function (event) {
     input = $("#gamecode").val();
     if (validate()) {
         simulate();
-        $("#valid").html("Valid code: " + input).show();
-        $("#bid_win").html("Winning bid is " + bid.string() +
-             " by " + numToPlayer(bidder) + " (" + bid.tricks() +
-             " tricks required). Partner card is " +
-             partnerC.string() + ".").show();
-        $("#bid_gen").html(stringifyBids()).show();
-        $("#hands").html(stringifyHand()).show();
-        $("#plays").html(stringifyPlay()).show();
-        $("#outcome").html(stringifyOutcome()).show();
-        return false;
+        if (bidder !== partnerP) {
+            $("#valid").html("Valid code: " + input).show();
+            $("#bid_win").html("Winning bid is " + bid.string() +
+                 " by " + numToPlayer(bidder) + " (" + bid.tricks() +
+                 " tricks required). Partner card is " +
+                 partnerC.string() + ".").show();
+            $("#bid_gen").html(stringifyBids()).show();
+            $("#hands").html(stringifyHand()).show();
+            $("#plays").html(stringifyPlay()).show();
+            $("#outcome").html(stringifyOutcome()).show();
+            return false;
+        }
     }
     $("#valid").html("Invalid code - please check that you have copied the" +
         " correct code.").show();
