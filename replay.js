@@ -5,6 +5,7 @@
 
 /*
 To Do:
+0) Add post-simulate hand sorting.
 1) Add card replay support (turn by turn, may require splitting html elements).
 2) UI improvements (look into pictures/animations).
 3) Add advanced options (show/hide all hands, show/hide results).
@@ -15,12 +16,37 @@ Changelog:
 160620: Added hand viewing and tracking and partner support. (6h)
 170620: Added bid and partner parsing, as well as proper code validation. (6h)
 180620: Added pass support (2h).
+190620: Jesus says you must rest 1 day a week (0h).
+200620: Prototyped player-by-player parsing. (3h)
+210620: Added player-by-player parsing, restructured parsing structure. (7h)
 
-Known bugs:
-1) Cannot support prematurely ended games (rework parsing to player by player instead of trick by trick).
 */
 
-// use this code: b0b0abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
+/* sample game:
+
+1h 1s p 2d p p p
+
+ah(0) 9h(1) kh(2) 6h(3)
+4h(0) 2s(1) qh(2) 7h(3)
+5h(2) jh(3) 2h(0) 3s(1)
+10h(3) 2d(0) 9d(1) 3h(2)
+jc(1) 9c(2) 5c(3) ac(0)
+2c(0) kc(1) 10c(2) 7c(3)
+3c(1) qc(2) 4d(3) 6c(0)
+8d(3) qd(0) kd(1) 3d(2)
+as(1) 9s(2) 6s(3) 4s(0)
+4c(1) qs(2) 10d(3) 5s(0)
+ad(3) 7d(0) 8c(1) 5d(2)
+
+unplayed:
+0) 10s ks
+1) 7s js
+2) 6d jd
+3) 8h 8s
+
+use this code: 0CDzG-Y-kmcaNMAEXpqSvyhnoUJLBYzCGswlkdbHIKOuxQRWefjiDFPTrVZgt
+
+*/
 
 "use strict";
 
@@ -29,6 +55,7 @@ var bid,
     input,
     inputA,
     bidder,
+    played,
     bidCode,
     partCode,
     playCode,
@@ -115,9 +142,6 @@ function Trick(card1, card2, card3, card4) {
         for (i = 0; i < 4; i += 1) {
             this.cards[i].player = x;
             players[x].push(this.cards[i]);
-            if (this.cards[i].equals(partnerC)) {
-                partnerP = this.cards[i].player;
-            }
             x = (x + 1) % 4;
         }
         for (i = 0; i < 4; i += 1) {
@@ -179,9 +203,9 @@ function charToCard(char) {
 
 function validate() {
     var i;
-    if (input.length < 56 ||
-            (input.charAt(input.length - 53) !== "-" &&
-            input.charAt(input.length - 55) !== "-")) {
+    if (input.length < 57 ||
+            (input.charAt(input.length - 54) !== "-" &&
+            input.charAt(input.length - 56) !== "-")) {
         return false;
     }
     inputA = input.split("-");
@@ -204,7 +228,12 @@ function validate() {
                 (partCode.charCodeAt() > 96 && partCode.charCodeAt() < 123))) {
         return false;
     }
-    for (i = 0; i < playCode.length; i += 1) {
+    // if (playCode[0].charCodeAt() > 110 || playCode[0].charCodeAt() < 97) {
+    //     return false;
+    // }
+    played = playCode[0].charCodeAt() - 96;
+    playCode = playCode.substring(1);
+    for (i = 1; i < playCode.length; i += 1) {
         if (playCode.indexOf(playCode[i]) !== playCode.lastIndexOf(playCode[i]) ||
                 !((playCode[i].charCodeAt() > 64 && playCode[i].charCodeAt() < 91) ||
                     (playCode[i].charCodeAt() > 96 && playCode[i].charCodeAt() < 123))) {
@@ -236,6 +265,41 @@ function simulate() {
             charToCard(playCode.charCodeAt(4 * i + 1)),
             charToCard(playCode.charCodeAt(4 * i + 2)),
             charToCard(playCode.charCodeAt(4 * i + 3)));
+        x = tricks[i].parse(x);
+    }
+}
+
+function simulateUpdated() {
+    var i,
+        j,
+        x,
+        curr,
+        init = parseInt(bidCode[0], 10);
+    bids = [];
+    for (i = 1; i < bidCode.length; i += 1) {
+        curr = charToBid(bidCode[i].charCodeAt());
+        curr.player = init;
+        init = (init + 1) % 4;
+        bids.push(curr);
+    }
+    bid = bids[bids.length - 1];
+    bidder = bid.player;
+    x = bid.suit === "NT" ? bidder : (bidder + 1) % 4;
+    points = [0, 0, 0, 0];
+    partnerC = charToCard(partCode.charCodeAt(0));
+    for (i = 0; i < 4; i += 1) {
+        for (j = 0; j < 13; j += 1) {
+            players[i][j] = charToCard(playCode.charCodeAt(13 * i + j));
+            if (players[i][j].equals(partnerC)) {
+                partnerP = i;
+            }
+        }
+    }
+    for (i = 0; i < played; i += 1) {
+        tricks[i] = new Trick(players[x][i],
+            players[(x + 1) % 4][i],
+            players[(x + 2) % 4][i],
+            players[(x + 3) % 4][i]);
         x = tricks[i].parse(x);
     }
 }
@@ -272,7 +336,7 @@ function stringifyPlay() {
     var i,
         str = "";
     str += "Play order: ";
-    for (i = 0; i < 13; i += 1) {
+    for (i = 0; i < played; i += 1) {
         str += "<br>Trick " + (i + 1) + " won by " +
             numToPlayer(tricks[i].winner) + ": " + tricks[i].string();
     }
@@ -291,12 +355,12 @@ function stringifyOutcome() {
         pair2,
         str,
         temp = [0, 1, 2, 3];
-    pair1 = bidder === 1 && partnerP === 2
+    pair1 = bidder > partnerP && !(bidder === 2 && partnerP === 1)
         ? numToPlayer(partnerP) + "-" + numToPlayer(bidder)
         : numToPlayer(bidder) + "-" + numToPlayer(partnerP);
     remove(temp, bidder);
     remove(temp, partnerP);
-    pair2 = temp[0] === 1 && temp[1] === 2
+    pair2 = temp[0] > temp[1] && !(temp[0] === 2 && temp[1] === 1)
         ? numToPlayer(temp[1]) + "-" + numToPlayer(temp[0])
         : numToPlayer(temp[0]) + "-" + numToPlayer(temp[1]);
     str = "Partners are " + pair1 + " (bidders) and " + pair2 + ".<br>" +
@@ -311,7 +375,7 @@ function stringifyOutcome() {
 $("form").submit(function (event) {
     input = $("#gamecode").val();
     if (validate()) {
-        simulate();
+        simulateUpdated();
         if (bidder !== partnerP) {
             $("#valid").html("Valid code: " + input).show();
             $("#bid_win").html("Winning bid is " + bid.string() +
