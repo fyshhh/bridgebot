@@ -1,3 +1,54 @@
 body {
   padding: 20px;
 }
+
+#entire_play {
+  text-align: center;
+}
+
+#row_top, #row_bot {
+  height: 100px;
+  display: flex;
+  align-items: center;
+}
+
+#row_mid {
+  height: 371.98px;
+  display: flex;
+  align-items: center;
+}
+
+#row_mid > div {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+#history {
+  text-align: center;
+  margin-top: 150px;
+}
+
+#play_center {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+#play_center > div {
+  width: 100%;
+}
+
+#play_area_parent {
+  height: 87%;
+  display: flex;
+  align-items: center;
+}
+
+#nav_bar {
+  text-align: center;
+  align-self: flex-end;
+}
+
+.replay {
+  display: none;
+}

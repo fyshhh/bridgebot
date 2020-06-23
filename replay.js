@@ -5,7 +5,6 @@
 
 /*
 To Do:
-0) Add post-simulate hand sorting.
 1) Add card replay support (turn by turn, may require splitting html elements).
 2) UI improvements (look into pictures/animations).
 3) Add advanced options (show/hide all hands, show/hide results).
@@ -19,10 +18,10 @@ Changelog:
 190620: Jesus says you must rest 1 day a week (0h).
 200620: Prototyped player-by-player parsing. (3h)
 210620: Added player-by-player parsing, restructured parsing structure. (7h)
+220620: Began structuring for proper card replay support, added hand sorting, additional code cleanup. (2h)
+230620: Added card replay structuring. (4h)
 
-*/
-
-/* sample game:
+sample game:
 
 1h 1s p 2d p p p
 
@@ -126,14 +125,24 @@ function Card(num, suit) {
     };
 }
 
+function compare(a, b) {
+    return a.suit === b.suit
+        ? a.num - b.num
+        : a.suit.charCodeAt() - b.suit.charCodeAt();
+}
+
 function Trick(card1, card2, card3, card4) {
     this.winner = null;
     this.cards = [card1, card2, card3, card4];
     this.string = function () {
         return "[" + this.cards[0].stringP() +
+            (this.winner === 0 ? "[W]" : "") +
             ", " + this.cards[1].stringP() +
+            (this.winner === 1 ? "[W]" : "") +
             ", " + this.cards[2].stringP() +
-            ", " + this.cards[3].stringP() + "]";
+            (this.winner === 2 ? "[W]" : "") +
+            ", " + this.cards[3].stringP() +
+            (this.winner === 3 ? "[W]" : "") + "]";
     };
     this.parse = function (prev) {
         var i,
@@ -141,7 +150,6 @@ function Trick(card1, card2, card3, card4) {
             winner = 0;
         for (i = 0; i < 4; i += 1) {
             this.cards[i].player = x;
-            players[x].push(this.cards[i]);
             x = (x + 1) % 4;
         }
         for (i = 0; i < 4; i += 1) {
@@ -243,31 +251,31 @@ function validate() {
     return true;
 }
 
-function simulate() {
-    var i,
-        x,
-        curr,
-        init = parseInt(bidCode[0], 10);
-    bids = [];
-    for (i = 1; i < bidCode.length; i += 1) {
-        curr = charToBid(bidCode[i].charCodeAt());
-        curr.player = init;
-        init = (init + 1) % 4;
-        bids.push(curr);
-    }
-    bid = bids[bids.length - 1];
-    bidder = bid.player;
-    x = bidder;
-    points = [0, 0, 0, 0];
-    partnerC = charToCard(partCode.charCodeAt(0));
-    for (i = 0; i < 13; i += 1) {
-        tricks[i] = new Trick(charToCard(playCode.charCodeAt(4 * i)),
-            charToCard(playCode.charCodeAt(4 * i + 1)),
-            charToCard(playCode.charCodeAt(4 * i + 2)),
-            charToCard(playCode.charCodeAt(4 * i + 3)));
-        x = tricks[i].parse(x);
-    }
-}
+// function simulate() { UNUSED
+//     var i,
+//         x,
+//         curr,
+//         init = parseInt(bidCode[0], 10);
+//     bids = [];
+//     for (i = 1; i < bidCode.length; i += 1) {
+//         curr = charToBid(bidCode[i].charCodeAt());
+//         curr.player = init;
+//         init = (init + 1) % 4;
+//         bids.push(curr);
+//     }
+//     bid = bids[bids.length - 1];
+//     bidder = bid.player;
+//     x = bidder;
+//     points = [0, 0, 0, 0];
+//     partnerC = charToCard(partCode.charCodeAt(0));
+//     for (i = 0; i < 13; i += 1) {
+//         tricks[i] = new Trick(charToCard(playCode.charCodeAt(4 * i)),
+//             charToCard(playCode.charCodeAt(4 * i + 1)),
+//             charToCard(playCode.charCodeAt(4 * i + 2)),
+//             charToCard(playCode.charCodeAt(4 * i + 3)));
+//         x = tricks[i].parse(x);
+//     }
+// }
 
 function simulateUpdated() {
     var i,
@@ -302,6 +310,9 @@ function simulateUpdated() {
             players[(x + 3) % 4][i]);
         x = tricks[i].parse(x);
     }
+    for (i = 0; i < 4; i += 1) {
+        players[i].sort(compare);
+    }
 }
 
 function stringifyBids() {
@@ -335,10 +346,9 @@ function stringifyHand() {
 function stringifyPlay() {
     var i,
         str = "";
-    str += "Play order: ";
+    str += "History: ";
     for (i = 0; i < played; i += 1) {
-        str += "<br>Trick " + (i + 1) + " won by " +
-            numToPlayer(tricks[i].winner) + ": " + tricks[i].string();
+        str += "<br>Trick " + (i + 1) + ": " + tricks[i].string();
     }
     return str;
 }
@@ -377,15 +387,16 @@ $("form").submit(function (event) {
     if (validate()) {
         simulateUpdated();
         if (bidder !== partnerP) {
-            $("#valid").html("Valid code: " + input).show();
+            $("#valid").html("Valid code: " + input);
             $("#bid_win").html("Winning bid is " + bid.string() +
                  " by " + numToPlayer(bidder) + " (" + bid.tricks() +
                  " tricks required). Partner card is " +
-                 partnerC.string() + ".").show();
-            $("#bid_gen").html(stringifyBids()).show();
-            $("#hands").html(stringifyHand()).show();
-            $("#plays").html(stringifyPlay()).show();
-            $("#outcome").html(stringifyOutcome()).show();
+                 partnerC.string() + ".");
+            $("#bid_gen").html(stringifyBids());
+            $("#hands").html(stringifyHand());
+            $("#plays").html(stringifyPlay());
+            $("#outcome").html(stringifyOutcome());
+            $(".replay").show();
             return false;
         }
     }
