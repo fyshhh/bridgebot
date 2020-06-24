@@ -26,7 +26,6 @@ body {
 
 #history {
   text-align: center;
-  margin-top: 150px;
 }
 
 #play_center {
@@ -45,9 +44,9 @@ body {
 }
 
 #nav_bar {
-  text-align: center;
   align-self: flex-end;
 }
+
 
 .replay {
   display: none;
