@@ -16,6 +16,7 @@ Changelog:\
 200620: Prototyped player-by-player parsing. (3h)\
 210620: Added player-by-player parsing, restructured parsing structure. (7h)\
 220620: Began structuring for proper card replay support, added hand sorting, additional code cleanup. (2h)\
-230620: Added card replay structuring. (4h)
+230620: Added card replay structuring. (4h)\
+240620: Improved upon card replay structuring, added link support (now possible to input a code via link). (5h)
 
 use this code: 0CDzG-Y-kmcaNMAEXpqSvyhnoUJLBYzCGswlkdbHIKOuxQRWefjiDFPTrVZgt
