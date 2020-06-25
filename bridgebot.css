@@ -13,7 +13,7 @@ body {
 }
 
 #row_mid {
-  height: 371.98px;
+  height: 520px;
   display: flex;
   align-items: center;
 }
@@ -47,6 +47,13 @@ body {
   align-self: flex-end;
 }
 
+.loaded {
+  background-color: green;
+  -webkit-transition: all 1s ease-in-out;
+  -moz-transition: all 1s ease-in-out;
+  -o-transition: all 1s ease-in-out;
+  transition: all 1s ease-in-out;
+}
 
 .replay {
   display: none;

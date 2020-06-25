@@ -39,45 +39,48 @@
         <div id="entire_play" class="replay col-sm-9">
           <div id="row_top" class="row">
             <div class="col-sm-2"></div>
-            <div id="hand0" class="col-sm-8">North hand</div>
+            <div id="hand0" class="col-sm-8"></div>
             <div class="col-sm-2"></div>
           </div>
           <div id="row_mid" class="row">
-            <div id="hand3" class="col-sm-2">West hand</div>
+            <div id="hand3" class="col-sm-2"></div>
             <div id="play_center" class="col-sm-8">
               <div id="play_area_parent" class="row">
-                <div id="play_area" class="col-sm-12">Play area</div>
+                <div id="play_area" class="col-sm-12">Play</div>
+              </div>
+              <div class="row">
+                <div id="stack" class="col-sm-12">Stack information</div>
               </div>
               <div class="row">
                 <div id="nav_bar" class="col-sm-12">
-                  <button id="restart" type="button" class="btn btn-sm btn-outline-dark"><< Restart</button>
-                  <button id="prevtrick" type="button" class="btn btn-sm btn-outline-dark">< Trick</button>
-                  <button id="prevplay" type="button" class="btn btn-sm btn-outline-dark">< Play</button>
-                  <button id="nextplay" type="button" class="btn btn-sm btn-outline-dark">Play ></button>
-                  <button id="nexttrick" type="button" class="btn btn-sm btn-outline-dark">Trick ></button>
-                  <button id="skip" type="button" class="btn btn-sm btn-outline-dark">End >></button>
+                  <button id="restart" type="button" class="btn btn-sm btn-outline-dark">&#9198; Restart</button>
+                  <button id="prevtrick" type="button" class="btn btn-sm btn-outline-dark">&#9194; Trick</button>
+                  <button id="prevplay" type="button" class="btn btn-sm btn-outline-dark">&#9194; Play</button>
+                  <button id="nextplay" type="button" class="btn btn-sm btn-outline-dark">Play &#9193;</button>
+                  <button id="nexttrick" type="button" class="btn btn-sm btn-outline-dark">Trick &#9193;</button>
+                  <button id="skip" type="button" class="btn btn-sm btn-outline-dark">End &#9197;</button>
                 </div>
               </div>
             </div>
-            <div id="hand1" class="col-sm-2">East hand</div>
+            <div id="hand1" class="col-sm-2"></div>
           </div>
           <div id="row_bot" class="row">
             <div class="col-sm-2"></div>
-            <div id="hand2" class="col-sm-8">South hand</div>
+            <div id="hand2" class="col-sm-8"></div>
             <div class="col-sm-2"></div>
           </div>
         </div>
         <div id="history" class="replay col-sm-3">
-          <table style="width:250px" class="table table-bordered">
+          <table style="width:280px" class="table table-bordered">
             <colgroup>
-              <col span="1" style="width:32%">
-              <col span="1" style="width:17%">
-              <col span="1" style="width:17%">
-              <col span="1" style="width:17%">
-              <col span="1" style="width:17%">
+              <col span="1" style="width:64px">
+              <col span="1" style="width:54px">
+              <col span="1" style="width:54px">
+              <col span="1" style="width:54px">
+              <col span="1" style="width:54px">
             </colgroup>
             <thead>
-              <tr>
+              <tr class="bg-info text-white">
                 <th scope="col">Trick</th>
                 <th scope="col">N</th>
                 <th scope="col">E</th>
@@ -86,96 +89,96 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr id="row0" class="bg-secondary text-muted">
                 <th scope="row">1</th>
-                <td id="play00"></td>
                 <td id="play01"></td>
                 <td id="play02"></td>
                 <td id="play03"></td>
+                <td id="play04"></td>
               </tr>
-              <tr>
+              <tr id="row1" class="bg-secondary text-muted">
                 <th scope="row">2</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td id="play11"></td>
+                <td id="play12"></td>
+                <td id="play13"></td>
+                <td id="play14"></td>
               </tr>
-              <tr>
+              <tr id="row2" class="bg-secondary text-muted">
                 <th scope="row">3</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td id="play21"></td>
+                <td id="play22"></td>
+                <td id="play23"></td>
+                <td id="play24"></td>
               </tr>
-              <tr>
+              <tr id="row3" class="bg-secondary text-muted">
                 <th scope="row">4</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td id="play31"></td>
+                <td id="play32"></td>
+                <td id="play33"></td>
+                <td id="play34"></td>
               </tr>
-              <tr>
+              <tr id="row4" class="bg-secondary text-muted">
                 <th scope="row">5</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td id="play41"></td>
+                <td id="play42"></td>
+                <td id="play43"></td>
+                <td id="play44"></td>
               </tr>
-              <tr>
+              <tr id="row5" class="bg-secondary text-muted">
                 <th scope="row">6</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td id="play51"></td>
+                <td id="play52"></td>
+                <td id="play53"></td>
+                <td id="play54"></td>
               </tr>
-              <tr>
+              <tr id="row6" class="bg-secondary text-muted">
                 <th scope="row">7</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td id="play61"></td>
+                <td id="play62"></td>
+                <td id="play63"></td>
+                <td id="play64"></td>
               </tr>
-              <tr>
+              <tr id="row7" class="bg-secondary text-muted">
                 <th scope="row">8</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td id="play71"></td>
+                <td id="play72"></td>
+                <td id="play73"></td>
+                <td id="play74"></td>
               </tr>
-              <tr>
+              <tr id="row8" class="bg-secondary text-muted">
                 <th scope="row">9</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td id="play81"></td>
+                <td id="play82"></td>
+                <td id="play83"></td>
+                <td id="play84"></td>
               </tr>
-              <tr>
+              <tr id="row9" class="bg-secondary text-muted">
                 <th scope="row">10</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td id="play91"></td>
+                <td id="play92"></td>
+                <td id="play93"></td>
+                <td id="play94"></td>
               </tr>
-              <tr>
+              <tr id="row10" class="bg-secondary text-muted">
                 <th scope="row">11</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td id="play101"></td>
+                <td id="play102"></td>
+                <td id="play103"></td>
+                <td id="play104"></td>
               </tr>
-              <tr>
+              <tr id="row11" class="bg-secondary text-muted">
                 <th scope="row">12</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td id="play111"></td>
+                <td id="play112"></td>
+                <td id="play113"></td>
+                <td id="play114"></td>
               </tr>
-              <tr>
+              <tr id="row12" class="bg-secondary text-muted">
                 <th scope="row">13</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td id="play121"></td>
+                <td id="play122"></td>
+                <td id="play123"></td>
+                <td id="play124"></td>
               </tr>
             </tbody>
           </table>
@@ -183,8 +186,6 @@
       </div>
     </div>
     <div id="hands" class="replay"></div>
-    <br>
-    <div id="plays" class="replay"></div>
     <br>
     <div id="outcome" class="replay"></div>
     <!-- replay.js - backend execution -->

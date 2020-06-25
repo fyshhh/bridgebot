@@ -21,6 +21,7 @@ Changelog:
 220620: Began structuring for proper card replay support, added hand sorting, additional code cleanup. (2h)
 230620: Added card replay structuring. (4h)
 240620: Improved upon card replay structuring, added link support (now possible to input a code via link). (4h)
+250520: Added history support. (6h)
 
 sample game:
 
@@ -46,6 +47,9 @@ unplayed:
 
 use this code: 0CDzG-Y-kmcaNMAEXpqSvyhnoUJLBYzCGswlkdbHIKOuxQRWefjiDFPTrVZgt
 
+clubs diamonds hearts spades
+&#9827; &#9826; &#9825; &#9824;
+
 */
 
 "use strict";
@@ -58,14 +62,17 @@ var i,
     bidder,
     played,
     bidCode,
-    currPlay,
+    currPlay = 0,
     partCode,
     playCode,
     partnerC,
     partnerP,
     tricks = [],
     points = [0, 0, 0, 0],
-    players = [[], [], [], []];
+    players = [[], [], [], []],
+    playersEnd = [[], [], [], []],
+    playersStart = [[], [], [], []],
+    playersClone = [[], [], [], []];
 
 function Bid(num, suit) {
     this.num = num;
@@ -254,33 +261,7 @@ function validate() {
     return true;
 }
 
-// function simulate() { OUTDATED
-//     var i,
-//         x,
-//         curr,
-//         init = parseInt(bidCode[0], 10);
-//     bids = [];
-//     for (i = 1; i < bidCode.length; i += 1) {
-//         curr = charToBid(bidCode[i].charCodeAt());
-//         curr.player = init;
-//         init = (init + 1) % 4;
-//         bids.push(curr);
-//     }
-//     bid = bids[bids.length - 1];
-//     bidder = bid.player;
-//     x = bidder;
-//     points = [0, 0, 0, 0];
-//     partnerC = charToCard(partCode.charCodeAt(0));
-//     for (i = 0; i < 13; i += 1) {
-//         tricks[i] = new Trick(charToCard(playCode.charCodeAt(4 * i)),
-//             charToCard(playCode.charCodeAt(4 * i + 1)),
-//             charToCard(playCode.charCodeAt(4 * i + 2)),
-//             charToCard(playCode.charCodeAt(4 * i + 3)));
-//         x = tricks[i].parse(x);
-//     }
-// }
-
-function simulateUpdated() {
+function simulate() {
     var i,
         j,
         x,
@@ -314,7 +295,20 @@ function simulateUpdated() {
         x = tricks[i].parse(x);
     }
     for (i = 0; i < 4; i += 1) {
-        players[i].sort(compare);
+        for (j = 0; j < 13; j += 1) {
+            playersClone[i][j] = players[i][j];
+        }
+        playersClone[i].sort(compare);
+    }
+    for (i = 0; i < 4; i += 1) {
+        for (j = 0; j < 13; j += 1) {
+            playersStart[i][j] = playersClone[i][j];
+        }
+    }
+    for (i = 0; i < 4; i += 1) {
+        for (j = played; j < 13; j += 1) {
+            playersEnd[i][j - played] = players[i][j];
+        }
     }
 }
 
@@ -328,11 +322,11 @@ function stringifyBids() {
     return str;
 }
 
-function computeHand(index) {
+function computeHand(arr, index) {
     var i,
         str = "";
-    for (i = 0; i < 13; i += 1) {
-        str += players[index][i].string() + ", ";
+    for (i = 0; i < arr[0].length; i += 1) {
+        str += arr[index][i].string() + ", ";
     }
     return "[" + str.substring(0, str.length - 2) + "]";
 }
@@ -341,7 +335,7 @@ function stringifyHand() {
     var i,
         str = "";
     for (i = 0; i < 4; i += 1) {
-        str += numToPlayer(i) + ": " + computeHand(i) + "<br>";
+        str += numToPlayer(i) + ": " + computeHand(players, i) + "<br>";
     }
     return str;
 }
@@ -388,7 +382,7 @@ function stringifyOutcome() {
 $("form").submit(function (event) {
     input = $("#gamecode").val();
     if (validate()) {
-        simulateUpdated();
+        simulate();
         if (bidder !== partnerP) {
             $("#valid").html("Valid code: " + input);
             $("#bid_win").html("Winning bid is " + bid.string() +
@@ -397,10 +391,9 @@ $("form").submit(function (event) {
                  partnerC.string() + ".");
             $("#bid_gen").html(stringifyBids());
             $("#hands").html(stringifyHand());
-            $("#plays").html(stringifyPlay());
             $("#outcome").html(stringifyOutcome());
             for (i = 0; i < 4; i += 1) {
-                $("#hand" + i).html(computeHand(i));
+                $("#hand" + i).html(computeHand(playersStart, i));
             }
             $(".replay").show();
             return false;
@@ -421,5 +414,186 @@ $(window).on('load', function () {
     }
 });
 
+$("#restart").on('click', function () {
+    var card,
+        play,
+        prev,
+        trick,
+        player;
+    if (currPlay !== 0) {
+        prev = 0;
+        for (currPlay; currPlay > prev; currPlay -= 1) {
+            if (currPlay % 5 !== 0) {
+                play = currPlay % 5 - 1;
+                trick = Math.floor(currPlay / 5);
+                if (currPlay % 5 === 1) {
+                    $("#row" + trick).addClass("bg-secondary text-muted");
+                }
+                if (currPlay % 10 === 6) {
+                    $("#row" + trick).removeClass("bg-light");
+                }
+                card = tricks[trick].cards[play];
+                player = card.player + 1;
+                $("#play" + trick + player).html("");
+            } else {
+                trick = currPlay / 5 - 1;
+                player = tricks[trick].winner + 1;
+                $("#play" + trick + player).removeClass("bg-success text-white");
+            }
+        }
+    }
+});
+
+$("#prevtrick").on('click', function () {
+    var card,
+        play,
+        prev,
+        trick,
+        player;
+    if (currPlay !== 0) {
+        if (currPlay % 5 === 0) {
+            prev = Math.max(0, currPlay - 5);
+        } else {
+            prev = Math.floor(currPlay / 5) * 5;
+        }
+        for (currPlay; currPlay > prev; currPlay -= 1) {
+            if (currPlay % 5 !== 0) {
+                play = currPlay % 5 - 1;
+                trick = Math.floor(currPlay / 5);
+                if (currPlay % 5 === 1) {
+                    $("#row" + trick).addClass("bg-secondary text-muted");
+                }
+                if (currPlay % 10 === 6) {
+                    $("#row" + trick).removeClass("bg-light");
+                }
+                card = tricks[trick].cards[play];
+                player = card.player + 1;
+                $("#play" + trick + player).html("");
+            } else {
+                trick = currPlay / 5 - 1;
+                player = tricks[trick].winner + 1;
+                $("#play" + trick + player).removeClass("bg-success text-white");
+            }
+        }
+    }
+});
+
+$("#prevplay").on('click', function () {
+    var card,
+        play,
+        trick,
+        player;
+    if (currPlay !== 0) {
+        if (currPlay % 5 !== 0) {
+            play = currPlay % 5 - 1;
+            trick = Math.floor(currPlay / 5);
+            if (currPlay % 5 === 1) {
+                $("#row" + trick).addClass("bg-secondary text-muted");
+            }
+            if (currPlay % 10 === 6) {
+                $("#row" + trick).removeClass("bg-light");
+            }
+            card = tricks[trick].cards[play];
+            player = card.player + 1;
+            $("#play" + trick + player).html("");
+        } else {
+            trick = currPlay / 5 - 1;
+            player = tricks[trick].winner + 1;
+            $("#play" + trick + player).removeClass("bg-success text-white");
+        }
+        currPlay -= 1;
+    }
+});
+
 $("#nextplay").on('click', function () {
+    var card,
+        play,
+        trick,
+        player;
+    if (currPlay !== played * 5) {
+        currPlay += 1;
+        if (currPlay % 5 !== 0) {
+            play = currPlay % 5 - 1;
+            trick = Math.floor(currPlay / 5);
+            if (currPlay % 5 === 1) {
+                $("#row" + trick).removeClass("bg-secondary text-muted");
+            }
+            if (currPlay % 10 === 6) {
+                $("#row" + trick).addClass("bg-light");
+            }
+            card = tricks[trick].cards[play];
+            player = card.player + 1;
+            $("#play" + trick + player).html(tricks[trick].cards[play].string());
+        } else {
+            trick = currPlay / 5 - 1;
+            player = tricks[trick].winner + 1;
+            $("#play" + trick + player).addClass("bg-success text-white");
+        }
+    }
+});
+
+$("#nexttrick").on('click', function () {
+    var card,
+        next,
+        play,
+        trick,
+        player;
+    if (currPlay !== played * 5) {
+        if (currPlay % 5 === 0) {
+            next = Math.min(currPlay + 5, played * 5);
+        } else {
+            next = Math.ceil(currPlay / 5) * 5;
+        }
+        for (currPlay += 1; currPlay <= next; currPlay += 1) {
+            if (currPlay % 5 !== 0) {
+                play = currPlay % 5 - 1;
+                trick = Math.floor(currPlay / 5);
+                if (currPlay % 5 === 1) {
+                    $("#row" + trick).removeClass("bg-secondary text-muted");
+                }
+                if (currPlay % 10 === 6) {
+                    $("#row" + trick).addClass("bg-light");
+                }
+                card = tricks[trick].cards[play];
+                player = card.player + 1;
+                $("#play" + trick + player).html(tricks[trick].cards[play].string());
+            } else {
+                trick = currPlay / 5 - 1;
+                player = tricks[trick].winner + 1;
+                $("#play" + trick + player).addClass("bg-success text-white");
+            }
+        }
+        currPlay -= 1;
+    }
+});
+
+$("#skip").on('click', function () {
+    var card,
+        next,
+        play,
+        trick,
+        player;
+    if (currPlay !== played * 5) {
+        next = played * 5;
+        for (currPlay += 1; currPlay <= next; currPlay += 1) {
+            if (currPlay % 5 !== 0) {
+                play = currPlay % 5 - 1;
+                trick = Math.floor(currPlay / 5);
+                if (currPlay % 5 === 1) {
+                    $("#row" + trick).removeClass("bg-secondary text-muted");
+                }
+                if (currPlay % 10 === 6) {
+                    $("#row" + trick).addClass("bg-light");
+                }
+                card = tricks[trick].cards[play];
+                player = card.player + 1;
+                $("#play" + trick + player).html(tricks[trick].cards[play].string());
+            } else {
+                trick = currPlay / 5 - 1;
+                player = tricks[trick].winner + 1;
+                $("#play" + trick + player).addClass("bg-success text-white");
+            }
+        }
+        currPlay -= 1;
+    }
 });
