@@ -26,6 +26,8 @@ body {
 
 #history {
   text-align: center;
+  display:flex;
+  align-items:center;
 }
 
 #play_center {
@@ -45,14 +47,6 @@ body {
 
 #nav_bar {
   align-self: flex-end;
-}
-
-.loaded {
-  background-color: green;
-  -webkit-transition: all 1s ease-in-out;
-  -moz-transition: all 1s ease-in-out;
-  -o-transition: all 1s ease-in-out;
-  transition: all 1s ease-in-out;
 }
 
 .replay {

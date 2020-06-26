@@ -22,6 +22,7 @@ Changelog:
 230620: Added card replay structuring. (4h)
 240620: Improved upon card replay structuring, added link support (now possible to input a code via link). (4h)
 250520: Added history support. (6h)
+260620: Added tricks notification support and dynamic hand changing. (6h)
 
 sample game:
 
@@ -46,9 +47,6 @@ unplayed:
 3) 8h 8s
 
 use this code: 0CDzG-Y-kmcaNMAEXpqSvyhnoUJLBYzCGswlkdbHIKOuxQRWefjiDFPTrVZgt
-
-clubs diamonds hearts spades
-&#9827; &#9826; &#9825; &#9824;
 
 */
 
@@ -79,9 +77,20 @@ function Bid(num, suit) {
     this.suit = suit;
     this.player = null;
     this.string = function () {
-        return suit === "P"
-            ? "Pass"
-            : this.num + this.suit;
+        var temp;
+        if (this.suit === "P") {
+            return "Pass";
+        }
+        if (this.suit === "C") {
+            temp = "&#9827;";
+        } else if (this.suit === "D") {
+            temp = "&#9826;";
+        } else if (this.suit === "H") {
+            temp = "&#9825;";
+        } else {
+            temp = "&#9824;";
+        }
+        return this.num + temp;
     };
     this.tricks = function () {
         return this.num + 6;
@@ -107,7 +116,7 @@ function Card(num, suit) {
     this.player = null;
     this.string = function () {
         var temp = this.num;
-        if (num === 10) {
+        if (this.num === 10) {
             temp = "J";
         } else if (num === 11) {
             temp = "Q";
@@ -118,7 +127,16 @@ function Card(num, suit) {
         } else {
             temp += 1;
         }
-        return temp + this.suit;
+        if (this.suit === "C") {
+            temp += "&#9827;";
+        } else if (this.suit === "D") {
+            temp += "&#9826;";
+        } else if (this.suit === "H") {
+            temp += "&#9825;";
+        } else {
+            temp += "&#9824;";
+        }
+        return temp;
     };
     this.stringP = function () {
         return this.string() + " (" + numToPlayer(this.player) + ")";
@@ -246,9 +264,6 @@ function validate() {
                 (partCode.charCodeAt() > 96 && partCode.charCodeAt() < 123))) {
         return false;
     }
-    // if (playCode[0].charCodeAt() > 110 || playCode[0].charCodeAt() < 97) {
-    //     return false;
-    // }
     played = playCode[0].charCodeAt() - 96;
     playCode = playCode.substring(1);
     for (i = 1; i < playCode.length; i += 1) {
@@ -323,10 +338,11 @@ function stringifyBids() {
 }
 
 function computeHand(arr, index) {
-    var i,
+    var i = 0,
         str = "";
-    for (i = 0; i < arr[0].length; i += 1) {
+    while (arr[index][i] !== undefined) {
         str += arr[index][i].string() + ", ";
+        i += 1;
     }
     return "[" + str.substring(0, str.length - 2) + "]";
 }
@@ -354,6 +370,16 @@ function remove(arr, num) {
     var index = arr.indexOf(num);
     if (index > -1) {
         arr.splice(index, 1);
+    }
+}
+
+function removeCard(arr, card) {
+    var i;
+    for (i = 0; i < 13; i += 1) {
+        if (card.equals(arr[i])) {
+            arr.splice(i, 1);
+            return;
+        }
     }
 }
 
@@ -390,12 +416,14 @@ $("form").submit(function (event) {
                  " tricks required). Partner card is " +
                  partnerC.string() + ".");
             $("#bid_gen").html(stringifyBids());
-            $("#hands").html(stringifyHand());
             $("#outcome").html(stringifyOutcome());
             for (i = 0; i < 4; i += 1) {
                 $("#hand" + i).html(computeHand(playersStart, i));
             }
+            $("#winning_bid").html("Winning bid: " + bid.string());
+            $("#partner_card").html("Partner card: " + partnerC.string());
             $(".replay").show();
+            $("html, body").animate({scrollTop: 393 }, "slow");
             return false;
         }
     }
@@ -415,7 +443,9 @@ $(window).on('load', function () {
 });
 
 $("#restart").on('click', function () {
-    var card,
+    var i,
+        j,
+        card,
         play,
         prev,
         trick,
@@ -433,14 +463,22 @@ $("#restart").on('click', function () {
                     $("#row" + trick).removeClass("bg-light");
                 }
                 card = tricks[trick].cards[play];
-                player = card.player + 1;
-                $("#play" + trick + player).html("");
+                player = card.player;
+                $("#play" + trick + (player + 1)).html("");
             } else {
                 trick = currPlay / 5 - 1;
-                player = tricks[trick].winner + 1;
-                $("#play" + trick + player).removeClass("bg-success text-white");
+                player = tricks[trick].winner;
+                $("#play" + trick + (player + 1)).removeClass("bg-success text-white");
             }
         }
+        for (i = 0; i < 4; i += 1) {
+            playersClone[i] = [];
+            for (j = 0; j < 13; j += 1) {
+                playersClone[i][j] = playersStart[i][j];
+            }
+            $("#hand" + i).html(computeHand(playersClone, i));
+        }
+        $("#play_info").html("Skipped to start!").show().fadeOut(1000);
     }
 });
 
@@ -456,7 +494,7 @@ $("#prevtrick").on('click', function () {
         } else {
             prev = Math.floor(currPlay / 5) * 5;
         }
-        for (currPlay; currPlay > prev; currPlay -= 1) {
+        while (currPlay > prev) {
             if (currPlay % 5 !== 0) {
                 play = currPlay % 5 - 1;
                 trick = Math.floor(currPlay / 5);
@@ -467,13 +505,25 @@ $("#prevtrick").on('click', function () {
                     $("#row" + trick).removeClass("bg-light");
                 }
                 card = tricks[trick].cards[play];
-                player = card.player + 1;
-                $("#play" + trick + player).html("");
+                player = card.player;
+                $("#play" + trick + (player + 1)).html("");
             } else {
                 trick = currPlay / 5 - 1;
-                player = tricks[trick].winner + 1;
-                $("#play" + trick + player).removeClass("bg-success text-white");
+                player = tricks[trick].winner;
+                $("#play" + trick + (player + 1)).removeClass("bg-success text-white");
             }
+            currPlay -= 1;
+            if (currPlay % 5 !== 4) {
+                playersClone[player].push(card);
+                playersClone[player].sort(compare);
+                $("#hand" + player).html(computeHand(playersClone, player));
+            }
+        }
+        if (currPlay !== 0) {
+            trick = currPlay / 5 - 1;
+            player = tricks[trick].winner;
+            $("#play_info").html(numToPlayer(player) +
+                " takes the trick!").show().fadeOut(1000);
         }
     }
 });
@@ -494,14 +544,32 @@ $("#prevplay").on('click', function () {
                 $("#row" + trick).removeClass("bg-light");
             }
             card = tricks[trick].cards[play];
-            player = card.player + 1;
-            $("#play" + trick + player).html("");
+            player = card.player;
+            $("#play" + trick + (player + 1)).html("");
         } else {
             trick = currPlay / 5 - 1;
-            player = tricks[trick].winner + 1;
-            $("#play" + trick + player).removeClass("bg-success text-white");
+            player = tricks[trick].winner;
+            $("#play" + trick + (player + 1)).removeClass("bg-success text-white");
         }
         currPlay -= 1;
+        if (currPlay % 5 !== 4) {
+            playersClone[player].push(card);
+            playersClone[player].sort(compare);
+            $("#hand" + player).html(computeHand(playersClone, player));
+        }
+        if (currPlay % 5 !== 0) {
+            play = currPlay % 5 - 1;
+            trick = Math.floor(currPlay / 5);
+            card = tricks[trick].cards[play];
+            player = card.player;
+            $("#play_info").html(numToPlayer(player) +
+                " plays " + card.string() + "!").show().fadeOut(1000);
+        } else if (currPlay !== 0) {
+            trick = currPlay / 5 - 1;
+            player = tricks[trick].winner;
+            $("#play_info").html(numToPlayer(player) +
+                " takes the trick!").show().fadeOut(1000);
+        }
     }
 });
 
@@ -522,12 +590,18 @@ $("#nextplay").on('click', function () {
                 $("#row" + trick).addClass("bg-light");
             }
             card = tricks[trick].cards[play];
-            player = card.player + 1;
-            $("#play" + trick + player).html(tricks[trick].cards[play].string());
+            player = card.player;
+            removeCard(playersClone[player], card);
+            $("#hand" + player).html(computeHand(playersClone, player));
+            $("#play" + trick + (player + 1)).html(card.string());
+            $("#play_info").html(numToPlayer(player) +
+                " plays " + card.string() + "!").show().fadeOut(1000);
         } else {
             trick = currPlay / 5 - 1;
-            player = tricks[trick].winner + 1;
-            $("#play" + trick + player).addClass("bg-success text-white");
+            player = tricks[trick].winner;
+            $("#play" + trick + (player + 1)).addClass("bg-success text-white");
+            $("#play_info").html(numToPlayer(player) +
+                " takes the trick!").show().fadeOut(1000);
         }
     }
 });
@@ -555,12 +629,16 @@ $("#nexttrick").on('click', function () {
                     $("#row" + trick).addClass("bg-light");
                 }
                 card = tricks[trick].cards[play];
-                player = card.player + 1;
-                $("#play" + trick + player).html(tricks[trick].cards[play].string());
+                player = card.player;
+                removeCard(playersClone[player], card);
+                $("#hand" + player).html(computeHand(playersClone, player));
+                $("#play" + trick + (player + 1)).html(card.string());
             } else {
                 trick = currPlay / 5 - 1;
-                player = tricks[trick].winner + 1;
-                $("#play" + trick + player).addClass("bg-success text-white");
+                player = tricks[trick].winner;
+                $("#play" + trick + (player + 1)).addClass("bg-success text-white");
+                $("#play_info").html(numToPlayer(player) +
+                    " takes the trick!").show().fadeOut(1000);
             }
         }
         currPlay -= 1;
@@ -568,7 +646,9 @@ $("#nexttrick").on('click', function () {
 });
 
 $("#skip").on('click', function () {
-    var card,
+    var i,
+        j,
+        card,
         next,
         play,
         trick,
@@ -595,5 +675,13 @@ $("#skip").on('click', function () {
             }
         }
         currPlay -= 1;
+        for (i = 0; i < 4; i += 1) {
+            playersClone[i] = [];
+            for (j = 0; j < 13 - played; j += 1) {
+                playersClone[i][j] = playersEnd[i][j];
+            }
+            $("#hand" + i).html(computeHand(playersClone, i));
+        }
+        $("#play_info").html("Skipped to end!").show().fadeOut(1000);
     }
 });

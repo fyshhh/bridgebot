@@ -45,11 +45,19 @@
           <div id="row_mid" class="row">
             <div id="hand3" class="col-sm-2"></div>
             <div id="play_center" class="col-sm-8">
+              <div class="row">
+                <div id="winning_bid" class="details col-sm-6">Winning bid here</div>
+                <div id="partner_card" class="details col-sm-6">Partner card here</div>
+              </div>
               <div id="play_area_parent" class="row">
-                <div id="play_area" class="col-sm-12">Play</div>
+                <div id="stack" class="col-sm-12">Stack information</div>
               </div>
               <div class="row">
-                <div id="stack" class="col-sm-12">Stack information</div>
+                <div class="col-sm-12" style="height:24px">
+                  <row>
+                    <div id="play_info" class="col-sm-12"></div>
+                  </row>
+                </div>
               </div>
               <div class="row">
                 <div id="nav_bar" class="col-sm-12">
@@ -59,6 +67,10 @@
                   <button id="nextplay" type="button" class="btn btn-sm btn-outline-dark">Play &#9193;</button>
                   <button id="nexttrick" type="button" class="btn btn-sm btn-outline-dark">Trick &#9193;</button>
                   <button id="skip" type="button" class="btn btn-sm btn-outline-dark">End &#9197;</button>
+                  <br>
+                  <span style="font-size:11px; font-style:italic">
+                    Avoid pressing too quickly as notifications may fail to show up!
+                  </span>
                 </div>
               </div>
             </div>
@@ -71,7 +83,7 @@
           </div>
         </div>
         <div id="history" class="replay col-sm-3">
-          <table style="width:280px" class="table table-bordered">
+          <table style="width:280px; font-size:15px;" class="replay table table-bordered">
             <colgroup>
               <col span="1" style="width:64px">
               <col span="1" style="width:54px">
