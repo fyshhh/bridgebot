@@ -478,7 +478,7 @@ $("#restart").on('click', function () {
             }
             $("#hand" + i).html(computeHand(playersClone, i));
         }
-        $("#play_info").html("Skipped to start!").show().fadeOut(1000);
+        $("#play_info").html("Skipped to start!").stop(true, true).show().fadeOut(1000);
     }
 });
 
@@ -523,7 +523,7 @@ $("#prevtrick").on('click', function () {
             trick = currPlay / 5 - 1;
             player = tricks[trick].winner;
             $("#play_info").html(numToPlayer(player) +
-                " takes the trick!").show().fadeOut(1000);
+                " takes the trick!").stop(true, true).show().fadeOut(1000);
         }
     }
 });
@@ -563,12 +563,12 @@ $("#prevplay").on('click', function () {
             card = tricks[trick].cards[play];
             player = card.player;
             $("#play_info").html(numToPlayer(player) +
-                " plays " + card.string() + "!").show().fadeOut(1000);
+                " plays " + card.string() + "!").stop(true, true).show().fadeOut(1000);
         } else if (currPlay !== 0) {
             trick = currPlay / 5 - 1;
             player = tricks[trick].winner;
             $("#play_info").html(numToPlayer(player) +
-                " takes the trick!").show().fadeOut(1000);
+                " takes the trick!").stop(true, true).show().fadeOut(1000);
         }
     }
 });
@@ -595,13 +595,13 @@ $("#nextplay").on('click', function () {
             $("#hand" + player).html(computeHand(playersClone, player));
             $("#play" + trick + (player + 1)).html(card.string());
             $("#play_info").html(numToPlayer(player) +
-                " plays " + card.string() + "!").show().fadeOut(1000);
+                " plays " + card.string() + "!").stop(true, true).show().fadeOut(1000);
         } else {
             trick = currPlay / 5 - 1;
             player = tricks[trick].winner;
             $("#play" + trick + (player + 1)).addClass("bg-success text-white");
             $("#play_info").html(numToPlayer(player) +
-                " takes the trick!").show().fadeOut(1000);
+                " takes the trick!").stop(true, true).show().fadeOut(1000);
         }
     }
 });
@@ -638,7 +638,7 @@ $("#nexttrick").on('click', function () {
                 player = tricks[trick].winner;
                 $("#play" + trick + (player + 1)).addClass("bg-success text-white");
                 $("#play_info").html(numToPlayer(player) +
-                    " takes the trick!").show().fadeOut(1000);
+                    " takes the trick!").stop(true, true).show().fadeOut(1000);
             }
         }
         currPlay -= 1;
@@ -682,6 +682,6 @@ $("#skip").on('click', function () {
             }
             $("#hand" + i).html(computeHand(playersClone, i));
         }
-        $("#play_info").html("Skipped to end!").show().fadeOut(1000);
+        $("#play_info").html("Skipped to end!").stop(true, true).fadeOut(1000);
     }
 });
