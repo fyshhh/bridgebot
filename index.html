@@ -29,11 +29,6 @@
       </form>
     </div>
     <span id="valid"></span>
-    <br>
-    <span id="bid_win" class="replay"></span>
-    <br>
-    <span id="bid_gen" class="replay"></span>
-    <br>
     <div id="viewer" class="container-fluid">
       <div class="row">
         <div id="entire_play" class="replay col-sm-9">
@@ -44,33 +39,96 @@
           </div>
           <div id="row_mid" class="row">
             <div id="hand3" class="col-sm-2"></div>
-            <div id="play_center" class="col-sm-8">
-              <div class="row">
-                <div id="winning_bid" class="details col-sm-6">Winning bid here</div>
-                <div id="partner_card" class="details col-sm-6">Partner card here</div>
-              </div>
-              <div id="play_area_parent" class="row">
-                <div id="stack" class="col-sm-12">Stack information</div>
-              </div>
-              <div class="row">
-                <div class="col-sm-12" style="height:24px">
-                  <row>
-                    <div id="play_info" class="col-sm-12"></div>
-                  </row>
+            <div id="big_container" class="col-sm-8">
+              <div class="row" style="width:100%">
+                <div class="col-sm-12">
+                  <ul class="nav nav-pills nav-justified">
+                    <li class="nav-item">
+                      <a class="nav-link">Bids</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link active">Plays</a>
+                    </li>
+                  </ul>
                 </div>
               </div>
               <div class="row">
-                <div id="nav_bar" class="col-sm-12">
-                  <button id="restart" type="button" class="btn btn-sm btn-outline-dark">&#9198; Restart</button>
-                  <button id="prevtrick" type="button" class="btn btn-sm btn-outline-dark">&#9194; Trick</button>
-                  <button id="prevplay" type="button" class="btn btn-sm btn-outline-dark">&#9194; Play</button>
-                  <button id="nextplay" type="button" class="btn btn-sm btn-outline-dark">Play &#9193;</button>
-                  <button id="nexttrick" type="button" class="btn btn-sm btn-outline-dark">Trick &#9193;</button>
-                  <button id="skip" type="button" class="btn btn-sm btn-outline-dark">End &#9197;</button>
-                  <br>
-                  <span style="font-size:11px; font-style:italic">
-                    Currently not optimized for mobile.
-                  </span>
+                <div id="play_center" class="col-sm-12">
+                  <div class="row">
+                    <div id="winning_bid" class="details col-sm-6">Winning bid here</div>
+                    <div id="partner_card" class="details col-sm-6">Partner card here</div>
+                  </div>
+                  <div id="play_area_parent" class="row">
+                    <div id="inner_play_area" class="col-sm-12">
+                      <div class="row">
+                        <div id="tricks_won0" class="col-sm-12"></div>
+                      </div>
+                      <div id="inner_row" class="row">
+                        <div id="tricks_won3" class="col-sm-1"></div>
+                        <div id="stack" class="col-sm-10">
+                          <table id="inner_grid" class="table table-borderless">
+                            <colgroup>
+                              <col span="1" style="width:92px">
+                              <col span="1" style="width:193px">
+                              <col span="1" style="width:92px">
+                            </colgroup>
+                            <tbody>
+                              <tr style="height: 33%">
+                                <td></td>
+                                <td class="align-middle">
+                                  <div id="center0"></div>
+                                </td>
+                                <td></td>
+                              </tr>
+                              <tr style="height: 33%">
+                                <td class="align-middle">
+                                  <div id="center3"></div>
+                                </td>
+                                <td  class="align-middle" style="overflow-wrap: break-word; width: 193px">
+                                  <div id="announcement"></div>
+                                </td>
+                                <td class="align-middle">
+                                  <div id="center1"></div>
+                                </td>
+                              </tr>
+                              <tr style="height: 33%">
+                                <td></td>
+                                <td class="align-middle">
+                                  <div id="center2"></div>
+                                </td>
+                                <td></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div id="tricks_won1"class="col-sm-1"></div>
+                      </div>
+                      <div class="row">
+                        <div id="tricks_won2" class="col-sm-12"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-12" style="height:24px">
+                      <row>
+                        <div id="play_info" class="col-sm-12"></div>
+                      </row>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div id="nav_bar" class="col-sm-12">
+                      <button id="restart" type="button" class="btn btn-sm btn-outline-dark">&#9198; Restart</button>
+                      <button id="prevtrick" type="button" class="btn btn-sm btn-outline-dark">&#9194; Trick</button>
+                      <button id="prevplay" type="button" class="btn btn-sm btn-outline-dark">&#9194; Play</button>
+                      <button id="nextplay" type="button" class="btn btn-sm btn-outline-dark">Play &#9193;</button>
+                      <button id="nexttrick" type="button" class="btn btn-sm btn-outline-dark">Trick &#9193;</button>
+                      <button id="skip" type="button" class="btn btn-sm btn-outline-dark">End &#9197;</button>
+                      <br>
+                      <span style="font-size:11px; font-style:italic">
+                        Currently not optimized for mobile.
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -197,9 +255,6 @@
         </div>
       </div>
     </div>
-    <div id="hands" class="replay"></div>
-    <br>
-    <div id="outcome" class="replay"></div>
     <!-- replay.js - backend execution -->
     <script type="text/javascript" src="replay.js"></script>
   </body>
