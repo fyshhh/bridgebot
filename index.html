@@ -44,19 +44,73 @@
                 <div class="col-sm-12">
                   <ul class="nav nav-pills nav-justified">
                     <li class="nav-item">
-                      <a class="nav-link">Bids</a>
+                      <button id="bid_toggle" class="btn btn-outline-info active">Bids</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link active">Plays</a>
+                      <button id="play_toggle" class="btn btn-outline-info">Plays</a>
                     </li>
                   </ul>
                 </div>
               </div>
               <div class="row">
-                <div id="play_center" class="col-sm-12">
+                <div id="bid_center" class="display_center col-sm-12">
+                  <div id="bid_area_parent" class="row">
+                    <div id="bid_area" class="col-sm-12">
+                      <table class="table table-borderless">
+                        <colgroup>
+                          <col span="1" style="width:28%">
+                          <col span="1" style="width:44%">
+                          <col span="1" style="width:28%">
+                        </colgroup>
+                        <tbody>
+                          <tr style="height: 33%">
+                            <td></td>
+                            <td class="align-middle">
+                              <div id="bid0"></div>
+                            </td>
+                            <td></td>
+                          </tr>
+                          <tr style="height: 33%">
+                            <td class="align-middle">
+                              <div id="bid3"></div>
+                            </td>
+                            <td class="align-middle" style="overflow-wrap: break-word; width: 193px">
+                              <div id="bid_announcement"></div>
+                            </td>
+                            <td class="align-middle">
+                              <div id="bid1"></div>
+                            </td>
+                          </tr>
+                          <tr style="height: 33%">
+                            <td></td>
+                            <td class="align-middle">
+                              <div id="bid2"></div>
+                            </td>
+                            <td></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                   <div class="row">
-                    <div id="winning_bid" class="details col-sm-6">Winning bid here</div>
-                    <div id="partner_card" class="details col-sm-6">Partner card here</div>
+                    <div id="bid_nav_bar" class="nav_bar col-sm-12">
+                      <button id="restartbid" type="button" class="btn btn-sm btn-outline-dark">&#9198; Restart</button>
+                      <button id="prev4bid" type="button" class="btn btn-sm btn-outline-dark">&#9194; 4 Bids</button>
+                      <button id="prevbid" type="button" class="btn btn-sm btn-outline-dark">&#9194; Bid</button>
+                      <button id="nextbid" type="button" class="btn btn-sm btn-outline-dark">Bid &#9193;</button>
+                      <button id="next4bid" type="button" class="btn btn-sm btn-outline-dark">4 Bids &#9193;</button>
+                      <button id="skipbid" type="button" class="btn btn-sm btn-outline-dark">End &#9197;</button>
+                      <br>
+                      <span style="font-size:11px; font-style:italic">
+                        Currently not optimized for small screen sizes.
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div id="play_center" class="display_center col-sm-12">
+                  <div class="row">
+                    <div id="winning_bid" class="details col-sm-6"></div>
+                    <div id="partner_card" class="details col-sm-6"></div>
                   </div>
                   <div id="play_area_parent" class="row">
                     <div id="inner_play_area" class="col-sm-12">
@@ -85,7 +139,7 @@
                                   <div id="center3"></div>
                                 </td>
                                 <td  class="align-middle" style="overflow-wrap: break-word; width: 193px">
-                                  <div id="announcement"></div>
+                                  <div id="play_announcement"></div>
                                 </td>
                                 <td class="align-middle">
                                   <div id="center1"></div>
@@ -116,16 +170,16 @@
                     </div>
                   </div>
                   <div class="row">
-                    <div id="nav_bar" class="col-sm-12">
-                      <button id="restart" type="button" class="btn btn-sm btn-outline-dark">&#9198; Restart</button>
+                    <div id="play_nav_bar" class="nav_bar col-sm-12">
+                      <button id="restartplay" type="button" class="btn btn-sm btn-outline-dark">&#9198; Restart</button>
                       <button id="prevtrick" type="button" class="btn btn-sm btn-outline-dark">&#9194; Trick</button>
                       <button id="prevplay" type="button" class="btn btn-sm btn-outline-dark">&#9194; Play</button>
                       <button id="nextplay" type="button" class="btn btn-sm btn-outline-dark">Play &#9193;</button>
                       <button id="nexttrick" type="button" class="btn btn-sm btn-outline-dark">Trick &#9193;</button>
-                      <button id="skip" type="button" class="btn btn-sm btn-outline-dark">End &#9197;</button>
+                      <button id="skipplay" type="button" class="btn btn-sm btn-outline-dark">End &#9197;</button>
                       <br>
                       <span style="font-size:11px; font-style:italic">
-                        Currently not optimized for mobile.
+                        Currently not optimized for small screen sizes.
                       </span>
                     </div>
                   </div>
@@ -139,8 +193,99 @@
             <div id="hand2" class="col-sm-8"></div>
             <div class="col-sm-2"></div>
           </div>
+        </div><div id="bid_history" class="replay col-sm-3">
+          <table style="width:280px; font-size:15px;" class="replay table table-bordered">
+            <colgroup>
+              <col span="1" style="width:64px">
+              <col span="1" style="width:54px">
+              <col span="1" style="width:54px">
+              <col span="1" style="width:54px">
+              <col span="1" style="width:54px">
+            </colgroup>
+            <thead>
+              <tr class="bg-info text-white">
+                <th scope="col">Bid</th>
+                <th scope="col">N</th>
+                <th scope="col">E</th>
+                <th scope="col">S</th>
+                <th scope="col">W</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr id="bid_row0" class="bg-secondary text-muted">
+                <th scope="row">1</th>
+                <td id="bid01"></td>
+                <td id="bid02"></td>
+                <td id="bid03"></td>
+                <td id="bid04"></td>
+              </tr>
+              <tr id="bid_row1" class="bg-secondary text-muted">
+                <th scope="row">2</th>
+                <td id="bid11"></td>
+                <td id="bid12"></td>
+                <td id="bid13"></td>
+                <td id="bid14"></td>
+              </tr>
+              <tr id="bid_row2" class="bg-secondary text-muted">
+                <th scope="row">3</th>
+                <td id="bid21"></td>
+                <td id="bid22"></td>
+                <td id="bid23"></td>
+                <td id="bid24"></td>
+              </tr>
+              <tr id="bid_row3" class="bg-secondary text-muted">
+                <th scope="row">4</th>
+                <td id="bid31"></td>
+                <td id="bid32"></td>
+                <td id="bid33"></td>
+                <td id="bid34"></td>
+              </tr>
+              <tr id="bid_row4" class="bg-secondary text-muted">
+                <th scope="row">5</th>
+                <td id="bid41"></td>
+                <td id="bid42"></td>
+                <td id="bid43"></td>
+                <td id="bid44"></td>
+              </tr>
+              <tr id="bid_row5" class="bg-secondary text-muted">
+                <th scope="row">6</th>
+                <td id="bid51"></td>
+                <td id="bid52"></td>
+                <td id="bid53"></td>
+                <td id="bid54"></td>
+              </tr>
+              <tr id="bid_row6" class="bg-secondary text-muted">
+                <th scope="row">7</th>
+                <td id="bid61"></td>
+                <td id="bid62"></td>
+                <td id="bid63"></td>
+                <td id="bid64"></td>
+              </tr>
+              <tr id="bid_row7" class="bg-secondary text-muted">
+                <th scope="row">8</th>
+                <td id="bid71"></td>
+                <td id="bid72"></td>
+                <td id="bid73"></td>
+                <td id="bid74"></td>
+              </tr>
+              <tr id="bid_row8" class="bg-secondary text-muted">
+                <th scope="row">9</th>
+                <td id="bid81"></td>
+                <td id="bid82"></td>
+                <td id="bid83"></td>
+                <td id="bid84"></td>
+              </tr>
+              <tr id="bid_row9" class="bg-secondary text-muted">
+                <th scope="row">10</th>
+                <td id="bid91"></td>
+                <td id="bid92"></td>
+                <td id="bid93"></td>
+                <td id="bid94"></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div id="history" class="replay col-sm-3">
+        <div id="play_history" class="replay col-sm-3">
           <table style="width:280px; font-size:15px;" class="replay table table-bordered">
             <colgroup>
               <col span="1" style="width:64px">
@@ -159,91 +304,91 @@
               </tr>
             </thead>
             <tbody>
-              <tr id="row0" class="bg-secondary text-muted">
+              <tr id="play_row0" class="bg-secondary text-muted">
                 <th scope="row">1</th>
                 <td id="play01"></td>
                 <td id="play02"></td>
                 <td id="play03"></td>
                 <td id="play04"></td>
               </tr>
-              <tr id="row1" class="bg-secondary text-muted">
+              <tr id="play_row1" class="bg-secondary text-muted">
                 <th scope="row">2</th>
                 <td id="play11"></td>
                 <td id="play12"></td>
                 <td id="play13"></td>
                 <td id="play14"></td>
               </tr>
-              <tr id="row2" class="bg-secondary text-muted">
+              <tr id="play_row2" class="bg-secondary text-muted">
                 <th scope="row">3</th>
                 <td id="play21"></td>
                 <td id="play22"></td>
                 <td id="play23"></td>
                 <td id="play24"></td>
               </tr>
-              <tr id="row3" class="bg-secondary text-muted">
+              <tr id="play_row3" class="bg-secondary text-muted">
                 <th scope="row">4</th>
                 <td id="play31"></td>
                 <td id="play32"></td>
                 <td id="play33"></td>
                 <td id="play34"></td>
               </tr>
-              <tr id="row4" class="bg-secondary text-muted">
+              <tr id="play_row4" class="bg-secondary text-muted">
                 <th scope="row">5</th>
                 <td id="play41"></td>
                 <td id="play42"></td>
                 <td id="play43"></td>
                 <td id="play44"></td>
               </tr>
-              <tr id="row5" class="bg-secondary text-muted">
+              <tr id="play_row5" class="bg-secondary text-muted">
                 <th scope="row">6</th>
                 <td id="play51"></td>
                 <td id="play52"></td>
                 <td id="play53"></td>
                 <td id="play54"></td>
               </tr>
-              <tr id="row6" class="bg-secondary text-muted">
+              <tr id="play_row6" class="bg-secondary text-muted">
                 <th scope="row">7</th>
                 <td id="play61"></td>
                 <td id="play62"></td>
                 <td id="play63"></td>
                 <td id="play64"></td>
               </tr>
-              <tr id="row7" class="bg-secondary text-muted">
+              <tr id="play_row7" class="bg-secondary text-muted">
                 <th scope="row">8</th>
                 <td id="play71"></td>
                 <td id="play72"></td>
                 <td id="play73"></td>
                 <td id="play74"></td>
               </tr>
-              <tr id="row8" class="bg-secondary text-muted">
+              <tr id="play_row8" class="bg-secondary text-muted">
                 <th scope="row">9</th>
                 <td id="play81"></td>
                 <td id="play82"></td>
                 <td id="play83"></td>
                 <td id="play84"></td>
               </tr>
-              <tr id="row9" class="bg-secondary text-muted">
+              <tr id="play_row9" class="bg-secondary text-muted">
                 <th scope="row">10</th>
                 <td id="play91"></td>
                 <td id="play92"></td>
                 <td id="play93"></td>
                 <td id="play94"></td>
               </tr>
-              <tr id="row10" class="bg-secondary text-muted">
+              <tr id="play_row10" class="bg-secondary text-muted">
                 <th scope="row">11</th>
                 <td id="play101"></td>
                 <td id="play102"></td>
                 <td id="play103"></td>
                 <td id="play104"></td>
               </tr>
-              <tr id="row11" class="bg-secondary text-muted">
+              <tr id="play_row11" class="bg-secondary text-muted">
                 <th scope="row">12</th>
                 <td id="play111"></td>
                 <td id="play112"></td>
                 <td id="play113"></td>
                 <td id="play114"></td>
               </tr>
-              <tr id="row12" class="bg-secondary text-muted">
+              <tr id="play_row12" class="bg-secondary text-muted">
                 <th scope="row">13</th>
                 <td id="play121"></td>
                 <td id="play122"></td>

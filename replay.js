@@ -23,29 +23,8 @@ Changelog:
 240620: Improved upon card replay structuring, added link support (now possible to input a code via link). (4h)
 250520: Added history support. (6h)
 260620: Added tricks notification support and dynamic hand changing. (6h)
-270620:
-
-sample game:
-
-1h 1s p 2d p p p
-
-ah(0) 9h(1) kh(2) 6h(3)
-4h(0) 2s(1) qh(2) 7h(3)
-5h(2) jh(3) 2h(0) 3s(1)
-10h(3) 2d(0) 9d(1) 3h(2)
-jc(1) 9c(2) 5c(3) ac(0)
-2c(0) kc(1) 10c(2) 7c(3)
-3c(1) qc(2) 4d(3) 6c(0)
-8d(3) qd(0) kd(1) 3d(2)
-as(1) 9s(2) 6s(3) 4s(0)
-4c(1) qs(2) 10d(3) 5s(0)
-ad(3) 7d(0) 8c(1) 5d(2)
-
-unplayed:
-0) 10s ks
-1) 7s js
-2) 6d jd
-3) 8h 8s
+270620: Finished entirety of play support. (8h)
+280620: Finished entirety of bid support. Ready for Milestone 1 deployment. (4h)
 
 use this code: 0CDzG-Y-kmcaNMAEXpqSvyhnoUJLBYzCGswlkdbHIKOuxQRWefjiDFPTrVZgt
 
@@ -65,7 +44,9 @@ var i,
     partnerC,
     partnerP,
     bids = [],
+    bidStarter,
     tricks = [],
+    currBid = 0,
     currPlay = 0,
     points = [0, 0, 0, 0],
     currTrick = [0, 0, 0, 0],
@@ -292,6 +273,7 @@ function simulate() {
         curr,
         init = parseInt(bidCode[0], 10);
     bids = [];
+    bidStarter = parseInt(bidCode[0], 10);
     for (i = 1; i < bidCode.length; i += 1) {
         curr = charToBid(bidCode[i].charCodeAt());
         curr.player = init;
@@ -346,16 +328,6 @@ function computeHand(arr, index) {
     return "[" + str.substring(0, str.length - 2) + "]";
 }
 
-function stringifyPlay() {
-    var i,
-        str = "";
-    str += "History: ";
-    for (i = 0; i < played; i += 1) {
-        str += "<br>Trick " + (i + 1) + ": " + tricks[i].string();
-    }
-    return str;
-}
-
 function remove(arr, num) {
     var index = arr.indexOf(num);
     if (index > -1) {
@@ -404,10 +376,12 @@ $("form").submit(function (event) {
                 " by " + numToPlayer(bidder));
             $("#partner_card").html("Partner card: " + partnerC.string());
             $(".replay").show();
-            $("#announcement").html(numToPlayer((bidder + (bid.suit === "NT" ? 0 : 1)) % 4) + " to play!");
-            console.log($(window).scrollTop());
+            $("#bid_announcement").html(numToPlayer(bidStarter) + " to bid!");
+            $("#play_announcement").html(numToPlayer((bidder + (bid.suit === "NT" ? 0 : 1)) % 4) + " to play!");
             $("html, body").animate({scrollTop: ($(window).height() - 465) }, "slow");
             $("#valid").hide();
+            $("#play_history").hide();
+            $("#play_center").hide();
             return false;
         }
         $("#valid").html("Invalid code - partner card is held by bidder.").show();
@@ -425,7 +399,199 @@ $(window).on('load', function () {
     }
 });
 
-$("#restart").on('click', function () {
+$("#bid_toggle").on('click', function () {
+    if (!$("#bid_toggle").hasClass("active")) {
+        $("#bid_toggle").addClass("active");
+        $("#play_toggle").removeClass("active");
+        $("#bid_center").show();
+        $("#play_center").hide();
+        $("#bid_history").show();
+        $("#play_history").hide();
+    }
+});
+
+$("#play_toggle").on('click', function () {
+    if (!$("#play_toggle").hasClass("active")) {
+        $("#bid_toggle").removeClass("active");
+        $("#play_toggle").addClass("active");
+        $("#bid_center").hide();
+        $("#play_center").show();
+        $("#bid_history").hide();
+        $("#play_history").show();
+    }
+});
+
+$("#restartbid").on('click', function () {
+    var i;
+    $("#bid_announcement").html(numToPlayer(bidStarter) + " to bid!");
+    for (i = 0; i < 4; i += 1) {
+        $("#bid" + i).html("");
+    }
+    while (currBid > 0) {
+        if (currBid % 4 === 1) {
+            $("#bid_row" + Math.floor(currBid / 4)).removeClass("bg-light").addClass("bg-secondary text-muted");
+        }
+        if (currBid === bids.length + 3) {
+            $("#bid" + (Math.floor(currBid / 4) - 1) + (bidder + 1)).removeClass("bg-success text-white");
+        }
+        currBid -= 1;
+        $("#bid" + Math.floor(currBid / 4) + (currBid % 4 + 1)).html("");
+    }
+});
+
+$("#prev4bid").on('click', function () {
+    var temp = currBid;
+    if (currBid !== 0) {
+        while (currBid > Math.max(0, temp - 4)) {
+            if (currBid !== 0) {
+                if (currBid % 4 === 1) {
+                    $("#bid_row" + Math.floor(currBid / 4)).removeClass("bg-light").addClass("bg-secondary text-muted");
+                }
+                if (currBid === bids.length + 3) {
+                    $("#bid" + (Math.floor(currBid / 4) - 1) + (bidder + 1)).removeClass("bg-success text-white");
+                }
+                currBid -= 1;
+                $("#bid" + Math.floor(currBid / 4) + (currBid % 4 + 1)).html("");
+                $("#bid" + ((bidStarter + currBid) % 4)).html((currBid >= 4 ? bids[currBid - 4].string() : ""));
+                $("#bid_announcement").html(numToPlayer((bidStarter + currBid) % 4) + " to bid!");
+            }
+        }
+    }
+});
+
+$("#prevbid").on('click', function () {
+    if (currBid !== 0) {
+        if (currBid % 4 === 1) {
+            $("#bid_row" + Math.floor(currBid / 4)).removeClass("bg-light").addClass("bg-secondary text-muted");
+        }
+        if (currBid === bids.length + 3) {
+            $("#bid" + (Math.floor(currBid / 4) - 1) + (bidder + 1)).removeClass("bg-success text-white");
+        }
+        currBid -= 1;
+        $("#bid" + Math.floor(currBid / 4) + (currBid % 4 + 1)).html("");
+        $("#bid" + ((bidStarter + currBid) % 4)).html((currBid >= 4 ? bids[currBid - 4].string() : ""));
+        $("#bid_announcement").html(numToPlayer((bidStarter + currBid) % 4) + " to bid!");
+    }
+});
+
+$("#nextbid").on('click', function () {
+    var row = Math.floor(currBid / 4);
+    if (currBid < bids.length) {
+        $("#bid" + ((bidStarter + currBid) % 4)).html(bids[currBid].string());
+        $("#bid" + row + ((bidStarter + currBid) % 4 + 1)).html(bids[currBid].string());
+        $("#bid_row" + row).removeClass("bg-secondary text-muted");
+        if (row % 2 === 1) {
+            $("#bid_row" + row).addClass("bg-light");
+        }
+        currBid += 1;
+        $("#bid_announcement").html(numToPlayer((bidStarter + currBid) % 4) + " to bid!");
+    } else if (currBid < bids.length + 3) {
+        if (currBid === bids.length + 2) {
+            $("#bid" + ((bidStarter + currBid) % 4)).html(charToBid("z".charCodeAt()).string());
+            $("#bid" + row + ((bidStarter + currBid + 1) % 4)).html(charToBid("z".charCodeAt()).string());
+            $("#bid_row" + row).removeClass("bg-secondary text-muted");
+            if (row % 2 === 1) {
+                $("#bid_row" + row).addClass("bg-light");
+            }
+            currBid += 1;
+            $("#bid_announcement").html(numToPlayer(bidder) + " wins the bid!");
+            $("#bid" + (row - 1) + (bidder + 1)).addClass("bg-success text-white");
+        } else {
+            $("#bid" + ((bidStarter + currBid) % 4)).html(charToBid("z".charCodeAt()).string());
+            $("#bid" + row + ((bidStarter + currBid + 1) % 4)).html(charToBid("z".charCodeAt()).string());
+            $("#bid_row" + row).removeClass("bg-secondary text-muted");
+            if (row % 2 === 1) {
+                $("#bid_row" + row).addClass("bg-light");
+            }
+            currBid += 1;
+            $("#bid_announcement").html(numToPlayer((bidStarter + currBid) % 4) + " to bid!");
+        }
+    }
+});
+
+$("#next4bid").on('click', function () {
+    var row = Math.floor(currBid / 4),
+        temp = currBid;
+    if (currBid < bids.length + 3) {
+        while (currBid < Math.min(bids.length + 3, temp + 4)) {
+            if (currBid < bids.length) {
+                $("#bid" + ((bidStarter + currBid) % 4)).html(bids[currBid].string());
+                $("#bid" + row + ((bidStarter + currBid) % 4 + 1)).html(bids[currBid].string());
+                $("#bid_row" + row).removeClass("bg-secondary text-muted");
+                if (row % 2 === 1) {
+                    $("#bid_row" + row).addClass("bg-light");
+                }
+                currBid += 1;
+                $("#bid_announcement").html(numToPlayer((bidStarter + currBid) % 4) + " to bid!");
+            } else if (currBid < bids.length + 3) {
+                if (currBid === bids.length + 2) {
+                    $("#bid" + ((bidStarter + currBid) % 4)).html(charToBid("z".charCodeAt()).string());
+                    $("#bid" + row + ((bidStarter + currBid + 1) % 4)).html(charToBid("z".charCodeAt()).string());
+                    $("#bid_row" + row).removeClass("bg-secondary text-muted");
+                    if (row % 2 === 1) {
+                        $("#bid_row" + row).addClass("bg-light");
+                    }
+                    currBid += 1;
+                    $("#bid_announcement").html(numToPlayer(bidder) + " wins the bid!");
+                    $("#bid" + (row - 1) + (bidder + 1)).addClass("bg-success text-white");
+                } else {
+                    $("#bid" + ((bidStarter + currBid) % 4)).html(charToBid("z".charCodeAt()).string());
+                    $("#bid" + row + ((bidStarter + currBid + 1) % 4)).html(charToBid("z".charCodeAt()).string());
+                    $("#bid_row" + row).removeClass("bg-secondary text-muted");
+                    if (row % 2 === 1) {
+                        $("#bid_row" + row).addClass("bg-light");
+                    }
+                    currBid += 1;
+                    $("#bid_announcement").html(numToPlayer((bidStarter + currBid) % 4) + " to bid!");
+                }
+            }
+            row = Math.floor(currBid / 4);
+        }
+    }
+});
+
+$("#skipbid").on('click', function () {
+    var row = Math.floor(currBid / 4);
+    if (currBid < bids.length + 3) {
+        while (currBid < bids.length + 3) {
+            if (currBid < bids.length) {
+                $("#bid" + ((bidStarter + currBid) % 4)).html(bids[currBid].string());
+                $("#bid" + row + ((bidStarter + currBid) % 4 + 1)).html(bids[currBid].string());
+                $("#bid_row" + row).removeClass("bg-secondary text-muted");
+                if (row % 2 === 1) {
+                    $("#bid_row" + row).addClass("bg-light");
+                }
+                currBid += 1;
+                $("#bid_announcement").html(numToPlayer((bidStarter + currBid) % 4) + " to bid!");
+            } else if (currBid < bids.length + 3) {
+                if (currBid === bids.length + 2) {
+                    $("#bid" + ((bidStarter + currBid) % 4)).html(charToBid("z".charCodeAt()).string());
+                    $("#bid" + row + ((bidStarter + currBid + 1) % 4)).html(charToBid("z".charCodeAt()).string());
+                    $("#bid_row" + row).removeClass("bg-secondary text-muted");
+                    if (row % 2 === 1) {
+                        $("#bid_row" + row).addClass("bg-light");
+                    }
+                    currBid += 1;
+                    $("#bid_announcement").html(numToPlayer(bidder) + " wins the bid!");
+                    $("#bid" + (row - 1) + (bidder + 1)).addClass("bg-success text-white");
+                } else {
+                    $("#bid" + ((bidStarter + currBid) % 4)).html(charToBid("z".charCodeAt()).string());
+                    $("#bid" + row + ((bidStarter + currBid + 1) % 4)).html(charToBid("z".charCodeAt()).string());
+                    $("#bid_row" + row).removeClass("bg-secondary text-muted");
+                    if (row % 2 === 1) {
+                        $("#bid_row" + row).addClass("bg-light");
+                    }
+                    currBid += 1;
+                    $("#bid_announcement").html(numToPlayer((bidStarter + currBid) % 4) + " to bid!");
+                }
+            }
+            row = Math.floor(currBid / 4);
+        }
+    }
+});
+
+
+$("#restartplay").on('click', function () {
     var i,
         j,
         card,
@@ -440,10 +606,10 @@ $("#restart").on('click', function () {
                 play = currPlay % 5 - 1;
                 trick = Math.floor(currPlay / 5);
                 if (currPlay % 5 === 1) {
-                    $("#row" + trick).addClass("bg-secondary text-muted");
+                    $("#play_row" + trick).addClass("bg-secondary text-muted");
                 }
                 if (currPlay % 10 === 6) {
-                    $("#row" + trick).removeClass("bg-light");
+                    $("#play_row" + trick).removeClass("bg-light");
                 }
                 card = tricks[trick].cards[play];
                 player = card.player;
@@ -466,7 +632,7 @@ $("#restart").on('click', function () {
         }
         $("#play_info").html("Skipped to start!").stop(true, true).show().fadeOut(1000);
     }
-    $("#announcement").html(numToPlayer((bidder + (bid.suit === "NT" ? 0 : 1)) % 4) + " to play!");
+    $("#play_announcement").html(numToPlayer((bidder + (bid.suit === "NT" ? 0 : 1)) % 4) + " to play!");
 });
 
 $("#prevtrick").on('click', function () {
@@ -486,10 +652,10 @@ $("#prevtrick").on('click', function () {
                 play = currPlay % 5 - 1;
                 trick = Math.floor(currPlay / 5);
                 if (currPlay % 5 === 1) {
-                    $("#row" + trick).addClass("bg-secondary text-muted");
+                    $("#play_row" + trick).addClass("bg-secondary text-muted");
                 }
                 if (currPlay % 10 === 6) {
-                    $("#row" + trick).removeClass("bg-light");
+                    $("#play_row" + trick).removeClass("bg-light");
                 }
                 card = tricks[trick].cards[play];
                 player = card.player;
@@ -514,9 +680,9 @@ $("#prevtrick").on('click', function () {
             player = tricks[trick].winner;
             $("#play_info").html(numToPlayer(player) +
                 " takes the trick!").stop(true, true).show().fadeOut(1000);
-            $("#announcement").html(numToPlayer(player) + " to play!");
+            $("#play_announcement").html(numToPlayer(player) + " to play!");
         } else {
-            $("#announcement").html(numToPlayer((bidder + (bid.suit === "NT" ? 0 : 1)) % 4) + " to play!");
+            $("#play_announcement").html(numToPlayer((bidder + (bid.suit === "NT" ? 0 : 1)) % 4) + " to play!");
         }
     }
 });
@@ -531,10 +697,10 @@ $("#prevplay").on('click', function () {
             play = currPlay % 5 - 1;
             trick = Math.floor(currPlay / 5);
             if (currPlay % 5 === 1) {
-                $("#row" + trick).addClass("bg-secondary text-muted");
+                $("#play_row" + trick).addClass("bg-secondary text-muted");
             }
             if (currPlay % 10 === 6) {
-                $("#row" + trick).removeClass("bg-light");
+                $("#play_row" + trick).removeClass("bg-light");
             }
             card = tricks[trick].cards[play];
             player = card.player;
@@ -566,18 +732,18 @@ $("#prevplay").on('click', function () {
             $("#play_info").html(numToPlayer(player) +
                 " plays " + card.string() + "!").stop(true, true).show().fadeOut(1000);
             if (currPlay % 5 === 4) {
-                $("#announcement").html("Determining winner...");
+                $("#play_announcement").html("Determining winner...");
             } else {
-                $("#announcement").html(numToPlayer((player + 1) % 4) + " to play!");
+                $("#play_announcement").html(numToPlayer((player + 1) % 4) + " to play!");
             }
         } else if (currPlay !== 0) {
             trick = currPlay / 5 - 1;
             player = tricks[trick].winner;
             $("#play_info").html(numToPlayer(player) +
                 " takes the trick!").stop(true, true).show().fadeOut(1000);
-            $("#announcement").html(numToPlayer(player) + " to play!");
+            $("#play_announcement").html(numToPlayer(player) + " to play!");
         } else {
-            $("#announcement").html(numToPlayer((bidder + (bid.suit === "NT" ? 0 : 1)) % 4) + " to play!");
+            $("#play_announcement").html(numToPlayer((bidder + (bid.suit === "NT" ? 0 : 1)) % 4) + " to play!");
         }
     }
 });
@@ -594,10 +760,10 @@ $("#nextplay").on('click', function () {
             play = currPlay % 5 - 1;
             trick = Math.floor(currPlay / 5);
             if (currPlay % 5 === 1) {
-                $("#row" + trick).removeClass("bg-secondary text-muted");
+                $("#play_row" + trick).removeClass("bg-secondary text-muted");
             }
             if (currPlay % 10 === 6) {
-                $("#row" + trick).addClass("bg-light");
+                $("#play_row" + trick).addClass("bg-light");
             }
             card = tricks[trick].cards[play];
             player = card.player;
@@ -610,9 +776,9 @@ $("#nextplay").on('click', function () {
             $("#play_info").html(numToPlayer(player) +
                 " plays " + card.string() + "!").stop(true, true).show().fadeOut(1000);
             $("#center" + player).html(card.string()).css('visibility', 'visible');
-            $("#announcement").html(numToPlayer((player + 1) % 4) + " to play!");
+            $("#play_announcement").html(numToPlayer((player + 1) % 4) + " to play!");
             if (currPlay % 5 === 4) {
-                $("#announcement").html("Determining winner...");
+                $("#play_announcement").html("Determining winner...");
             }
         } else {
             trick = currPlay / 5 - 1;
@@ -626,9 +792,9 @@ $("#nextplay").on('click', function () {
             currTrick[player] += 1;
             $("#tricks_won" + player).html(currTrick[player]);
             if (currPlay === played * 5) {
-                $("#announcement").html(outcome());
+                $("#play_announcement").html(outcome());
             }
-            $("#announcement").html(numToPlayer(player % 4) + " to play!");
+            $("#play_announcement").html(numToPlayer(player % 4) + " to play!");
         }
     }
 });
@@ -650,10 +816,10 @@ $("#nexttrick").on('click', function () {
                 play = currPlay % 5 - 1;
                 trick = Math.floor(currPlay / 5);
                 if (currPlay % 5 === 1) {
-                    $("#row" + trick).removeClass("bg-secondary text-muted");
+                    $("#play_row" + trick).removeClass("bg-secondary text-muted");
                 }
                 if (currPlay % 10 === 6) {
-                    $("#row" + trick).addClass("bg-light");
+                    $("#play_row" + trick).addClass("bg-light");
                 }
                 card = tricks[trick].cards[play];
                 player = card.player;
@@ -671,7 +837,7 @@ $("#nexttrick").on('click', function () {
                     " takes the trick!").stop(true, true).show().fadeOut(1000);
                 currTrick[player] += 1;
                 $("#tricks_won" + player).html(currTrick[player]);
-                $("#announcement").html(numToPlayer(player) + " to play!");
+                $("#play_announcement").html(numToPlayer(player) + " to play!");
             }
         }
         for (i = 0; i < 4; i += 1) {
@@ -679,12 +845,12 @@ $("#nexttrick").on('click', function () {
         }
         currPlay -= 1;
         if (currPlay === played * 5) {
-            $("#announcement").html(outcome());
+            $("#play_announcement").html(outcome());
         }
     }
 });
 
-$("#skip").on('click', function () {
+$("#skipplay").on('click', function () {
     var i,
         j,
         card,
@@ -699,10 +865,10 @@ $("#skip").on('click', function () {
                 play = currPlay % 5 - 1;
                 trick = Math.floor(currPlay / 5);
                 if (currPlay % 5 === 1) {
-                    $("#row" + trick).removeClass("bg-secondary text-muted");
+                    $("#play_row" + trick).removeClass("bg-secondary text-muted");
                 }
                 if (currPlay % 10 === 6) {
-                    $("#row" + trick).addClass("bg-light");
+                    $("#play_row" + trick).addClass("bg-light");
                 }
                 card = tricks[trick].cards[play];
                 player = card.player;
@@ -729,7 +895,7 @@ $("#skip").on('click', function () {
         for (i = 0; i < 4; i += 1) {
             $("#center" + i).css('visibility', 'hidden');
         }
-        $("#announcement").html(outcome());
+        $("#play_announcement").html(outcome());
         $("#play_info").html("Skipped to end!").stop(true, true).fadeOut(1000);
     }
 });
