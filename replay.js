@@ -5,8 +5,9 @@
 
 /*
 To Do:
-1) UI improvements (look into pictures/animations).
-2) Add advanced options (show/hide all hands, show/hide results).
+1) Add card replay support (turn by turn, may require splitting html elements).
+2) UI improvements (look into pictures/animations).
+3) Add advanced options (show/hide all hands, show/hide results).
 
 Changelog:
 140620: Created site and code parsing for play order. (6h)
@@ -487,17 +488,17 @@ $("#nextbid").on('click', function () {
     } else if (currBid < bids.length + 3) {
         if (currBid === bids.length + 2) {
             $("#bid" + ((bidStarter + currBid) % 4)).html(charToBid("z".charCodeAt()).string());
-            $("#bid" + row + ((bidStarter + currBid + 1) % 4)).html(charToBid("z".charCodeAt()).string());
+            $("#bid" + row + ((bidStarter + currBid) % 4 + 1)).html(charToBid("z".charCodeAt()).string());
             $("#bid_row" + row).removeClass("bg-secondary text-muted");
             if (row % 2 === 1) {
                 $("#bid_row" + row).addClass("bg-light");
             }
             currBid += 1;
             $("#bid_announcement").html(numToPlayer(bidder) + " wins the bid!");
-            $("#bid" + (row - 1) + (bidder + 1)).addClass("bg-success text-white");
+            $("#bid" + (bidder === 0 ? row : row - 1) + (bidder + 1)).addClass("bg-success text-white");
         } else {
             $("#bid" + ((bidStarter + currBid) % 4)).html(charToBid("z".charCodeAt()).string());
-            $("#bid" + row + ((bidStarter + currBid + 1) % 4)).html(charToBid("z".charCodeAt()).string());
+            $("#bid" + row + ((bidStarter + currBid) % 4 + 1)).html(charToBid("z".charCodeAt()).string());
             $("#bid_row" + row).removeClass("bg-secondary text-muted");
             if (row % 2 === 1) {
                 $("#bid_row" + row).addClass("bg-light");
@@ -525,17 +526,17 @@ $("#next4bid").on('click', function () {
             } else if (currBid < bids.length + 3) {
                 if (currBid === bids.length + 2) {
                     $("#bid" + ((bidStarter + currBid) % 4)).html(charToBid("z".charCodeAt()).string());
-                    $("#bid" + row + ((bidStarter + currBid + 1) % 4)).html(charToBid("z".charCodeAt()).string());
+                    $("#bid" + row + ((bidStarter + currBid) % 4 + 1)).html(charToBid("z".charCodeAt()).string());
                     $("#bid_row" + row).removeClass("bg-secondary text-muted");
                     if (row % 2 === 1) {
                         $("#bid_row" + row).addClass("bg-light");
                     }
                     currBid += 1;
                     $("#bid_announcement").html(numToPlayer(bidder) + " wins the bid!");
-                    $("#bid" + (row - 1) + (bidder + 1)).addClass("bg-success text-white");
+                    $("#bid" + (bidder === 0 ? row : row - 1) + (bidder + 1)).addClass("bg-success text-white");
                 } else {
                     $("#bid" + ((bidStarter + currBid) % 4)).html(charToBid("z".charCodeAt()).string());
-                    $("#bid" + row + ((bidStarter + currBid + 1) % 4)).html(charToBid("z".charCodeAt()).string());
+                    $("#bid" + row + ((bidStarter + currBid) % 4 + 1)).html(charToBid("z".charCodeAt()).string());
                     $("#bid_row" + row).removeClass("bg-secondary text-muted");
                     if (row % 2 === 1) {
                         $("#bid_row" + row).addClass("bg-light");
@@ -565,17 +566,17 @@ $("#skipbid").on('click', function () {
             } else if (currBid < bids.length + 3) {
                 if (currBid === bids.length + 2) {
                     $("#bid" + ((bidStarter + currBid) % 4)).html(charToBid("z".charCodeAt()).string());
-                    $("#bid" + row + ((bidStarter + currBid + 1) % 4)).html(charToBid("z".charCodeAt()).string());
+                    $("#bid" + row + ((bidStarter + currBid) % 4 + 1)).html(charToBid("z".charCodeAt()).string());
                     $("#bid_row" + row).removeClass("bg-secondary text-muted");
                     if (row % 2 === 1) {
                         $("#bid_row" + row).addClass("bg-light");
                     }
                     currBid += 1;
                     $("#bid_announcement").html(numToPlayer(bidder) + " wins the bid!");
-                    $("#bid" + (row - 1) + (bidder + 1)).addClass("bg-success text-white");
+                    $("#bid" + (bidder === 0 ? row : row - 1) + (bidder + 1)).addClass("bg-success text-white");
                 } else {
                     $("#bid" + ((bidStarter + currBid) % 4)).html(charToBid("z".charCodeAt()).string());
-                    $("#bid" + row + ((bidStarter + currBid + 1) % 4)).html(charToBid("z".charCodeAt()).string());
+                    $("#bid" + row + ((bidStarter + currBid) % 4 + 1)).html(charToBid("z".charCodeAt()).string());
                     $("#bid_row" + row).removeClass("bg-secondary text-muted");
                     if (row % 2 === 1) {
                         $("#bid_row" + row).addClass("bg-light");
