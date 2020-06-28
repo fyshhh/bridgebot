@@ -5,9 +5,8 @@
 
 /*
 To Do:
-1) Add card replay support (turn by turn, may require splitting html elements).
-2) UI improvements (look into pictures/animations).
-3) Add advanced options (show/hide all hands, show/hide results).
+1) UI improvements (look into pictures/animations).
+2) Add advanced options (show/hide all hands, show/hide results).
 
 Changelog:
 140620: Created site and code parsing for play order. (6h)
