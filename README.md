@@ -19,6 +19,8 @@ Changelog:\
 230620: Added card replay structuring. (4h)\
 240620: Improved upon card replay structuring, added link support (now possible to input a code via link). (5h)\
 250520: Added history support. (6h)\
-260620: Added tricks notification support and dynamic hand changing. (6h)
+260620: Added tricks notification support and dynamic hand changing. (6h)\
+270620: Finished entirety of play support. (8h)\
+280620: Finished entirety of bid support. Ready for Milestone 2 deployment. (4h)
 
 use this code: 0CDzG-Y-kmcaNMAEXpqSvyhnoUJLBYzCGswlkdbHIKOuxQRWefjiDFPTrVZgt
