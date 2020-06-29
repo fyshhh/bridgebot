@@ -293,6 +293,8 @@ function simulate() {
             }
         }
     }
+    currBid = 0;
+    currPlay = 0;
     for (i = 0; i < played; i += 1) {
         tricks[i] = new Trick(players[x][i],
             players[(x + 1) % 4][i],
@@ -380,6 +382,8 @@ $("form").submit(function (event) {
             $("#play_announcement").html(numToPlayer((bidder + (bid.suit === "NT" ? 0 : 1)) % 4) + " to play!");
             $("html, body").animate({scrollTop: ($(window).height() - 465) }, "slow");
             $("#valid").hide();
+            $("#bid_history").show();
+            $("#bid_center").show();
             $("#play_history").hide();
             $("#play_center").hide();
             return false;
@@ -793,8 +797,9 @@ $("#nextplay").on('click', function () {
             $("#tricks_won" + player).html(currTrick[player]);
             if (currPlay === played * 5) {
                 $("#play_announcement").html(outcome());
+            } else {
+                $("#play_announcement").html(numToPlayer(player % 4) + " to play!");
             }
-            $("#play_announcement").html(numToPlayer(player % 4) + " to play!");
         }
     }
 });
