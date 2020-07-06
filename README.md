@@ -52,8 +52,8 @@ In this stage, the final possible error is caught - if the player who holds the 
 
 In `index.html`, notable elements are marked by an `id` and a `class`. The jQuery snippets in `replay.js` access these elements with selectors as follows:
 
-* `$("#[id])` will select an element with the associated `id`
-* `$(".[class])` will select **all** elements with the associated `class`
+* `$("#[id]")` will select an element with the associated `id`
+* `$(".[class]")` will select **all** elements with the associated `class`
 
 Selectors are then succeeded by a method call (such as `.show()` or `.on('click', function () {...})`). The internal code segments in the method calls should be understandable by any readers with a background in coding (in any language).
 
