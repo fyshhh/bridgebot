@@ -3,7 +3,7 @@ BridgeBot Replay Viewer for Orbital 2020
 
 To see a sample run of the website, use this code: 0DzHzIMzzN-y-mfJFZNDnrCzxwvbKMXWIlqeTGVgmABOYHdyjPohiaELQRScpkUsut
 
-*If you're interested in reading the code but don't understand HTML, Javascript, jQuery or CSS, please scroll to the Front-End Interactions section below.*
+*If you're interested in reading the code but don't understand HTML, Javascript or jQuery, please scroll to the Front-End Interactions section below.*
 
 **Input Processing:**
 
