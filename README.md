@@ -3,6 +3,8 @@ BridgeBot Replay Viewer for Orbital 2020
 
 To see a sample run of the website, use this code: 0DzHzIMzzN-y-mfJFZNDnrCzxwvbKMXWIlqeTGVgmABOYHdyjPohiaELQRScpkUsut
 
+*If you're interested in reading the code but don't understand HTML, Javascript, jQuery or CSS, please scroll to the Front-End Interactions section below.*
+
 **Input Processing:**
 
 On page load, the website searches for a code from the URL (in the event the user accesses the page from the bot’s given link). Should a code not be found, then the website waits for the user to enter a code and click the “Simulate” button. Either method will generate a submit request.
@@ -48,7 +50,14 @@ In this stage, the final possible error is caught - if the player who holds the 
 
 **Front-End Interactions:**
 
-Should `simulate()` be successfully completed, the HTML elements that would display the replay is loaded. The hands belonging to the players are displayed respective to their cardinal directions, and the central as well as right-most areas are occupied by the replay viewer and the history table respectively. Both are toggleable between the bids and the plays, with both bids and plays having their own replay viewer and history table. The toggles are managed by `.on('click', function () {...})`, that calls `.show()` and `.hide()` on respective elements/
+In `index.html`, notable elements are marked by an `id` and a `class`. The jQuery snippets in `replay.js` access these elements with selectors as follows:
+
+* `$("#[id])` will select an element with the associated `id`
+* `$(".[class])` will select **all** elements with the associated `class`
+
+Selectors are then succeeded by a method call (such as `.show()` or `.on('click', function () {...})`). The internal code segments in the method calls should be understandable by any readers with a background in coding (in any language).
+
+Should `simulate()` be successfully completed, the HTML elements that would display the replay is loaded. The hands belonging to the players are displayed respective to their cardinal directions, and the central as well as right-most areas are occupied by the replay viewer and the history table respectively. Both are toggleable between the bids and the plays, with both bids and plays having their own replay viewer and history table. The toggles are managed by `.on('click', function () {...})`, that calls `.show()` and `.hide()` on respective elements.
 
 The navigation bar (above South’s hands) allows for interactive display of the sequence of bids and plays. The current state of the replay is managed by `currBid` and `currPlay` variables that represent the states of the bids and plays respectively. The initial load of the website shows the bid replay viewer and history table. Every button sends a request with `.on('click', function () {...})` that changes these variables (for instance, a click of "Next Play" increments `currPlay` by 1). These variables serve as an indicator for which square in the replay viewer to modify, as well as which cell (and row and column, if applicable) in the history table to modify.
 
