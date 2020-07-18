@@ -63,4 +63,4 @@ The navigation bar (above South’s hands) allows for interactive display of the
 
 Modifications are done by `.html("...")` that change the contents of the element, `.addClass(...)` and `.removeClass(...)` for background color changes and `.css('visibility', ...)` for hiding elements.
 
-The website is unfortunately currently optimized for 13’’ screens, and so some elements may be displaced when viewing with smaller screen sizes.
+~~The website is unfortunately currently optimized for 13’’ screens, and so some elements may be displaced when viewing with smaller screen sizes.~~ This has since been fixed.
