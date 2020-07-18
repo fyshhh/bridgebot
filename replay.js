@@ -24,7 +24,10 @@ Changelog:
 250520: Added history support. (6h)
 260620: Added tricks notification support and dynamic hand changing. (6h)
 270620: Finished entirety of play support. (8h)
-280620: Finished entirety of bid support. Ready for Milestone 1 deployment. (4h)
+280620: Finished entirety of bid support. Ready for Milestone 2 deployment. (4h)
+060720: Prototyped new mobile-friendly site (4h).
+100720: Worked on mobile-friendly site (3h).
+110720: Finished mobile-friendly site (3h).
 
 use this code: 0CDzG-Y-kmcaNMAEXpqSvyhnoUJLBYzCGswlkdbHIKOuxQRWefjiDFPTrVZgt
 
@@ -123,9 +126,6 @@ function Card(num, suit) {
         }
         return temp;
     };
-    this.stringP = function () {
-        return this.string() + " (" + numToPlayer(this.player) + ")";
-    };
     this.equals = function (card) {
         return this.num === card.num && this.suit === card.suit;
     };
@@ -147,16 +147,6 @@ function compare(a, b) {
 function Trick(card1, card2, card3, card4) {
     this.winner = null;
     this.cards = [card1, card2, card3, card4];
-    this.string = function () {
-        return "[" + this.cards[0].stringP() +
-            (this.winner === 0 ? "[W]" : "") +
-            ", " + this.cards[1].stringP() +
-            (this.winner === 1 ? "[W]" : "") +
-            ", " + this.cards[2].stringP() +
-            (this.winner === 2 ? "[W]" : "") +
-            ", " + this.cards[3].stringP() +
-            (this.winner === 3 ? "[W]" : "") + "]";
-    };
     this.parse = function (prev) {
         var i,
             x = prev,
@@ -380,7 +370,7 @@ $("form").submit(function (event) {
             $(".replay").show();
             $("#bid_announcement").html(numToPlayer(bidStarter) + " to bid!");
             $("#play_announcement").html(numToPlayer((bidder + (bid.suit === "NT" ? 0 : 1)) % 4) + " to play!");
-            $("html, body").animate({scrollTop: ($(window).height() - 465) }, "slow");
+            $("html, body").animate({scrollTop: ($(window).height() - 515) }, "slow");
             $("#valid").hide();
             $("#bid_history").show();
             $("#bid_center").show();
@@ -411,6 +401,8 @@ $("#bid_toggle").on('click', function () {
         $("#play_center").hide();
         $("#bid_history").show();
         $("#play_history").hide();
+        $("#bid_nav_bar").show();
+        $("#play_nav_bar").hide();
     }
 });
 
@@ -422,6 +414,8 @@ $("#play_toggle").on('click', function () {
         $("#play_center").show();
         $("#bid_history").hide();
         $("#play_history").show();
+        $("#bid_nav_bar").hide();
+        $("#play_nav_bar").show();
     }
 });
 
@@ -634,7 +628,7 @@ $("#restartplay").on('click', function () {
             currTrick[i] = 0;
             $("#tricks_won" + i).html(0);
         }
-        $("#play_info").html("Skipped to start!").stop(true, true).show().fadeOut(1000);
+        $("#play_info").html("Skipped to start!").stop(true, true).css("opacity", 1).animate({opacity: 0}, 1000);
     }
     $("#play_announcement").html(numToPlayer((bidder + (bid.suit === "NT" ? 0 : 1)) % 4) + " to play!");
 });
@@ -683,7 +677,7 @@ $("#prevtrick").on('click', function () {
             trick = currPlay / 5 - 1;
             player = tricks[trick].winner;
             $("#play_info").html(numToPlayer(player) +
-                " takes the trick!").stop(true, true).show().fadeOut(1000);
+                " takes the trick!").stop(true, true).css("opacity", 1).animate({opacity: 0}, 1000);
             $("#play_announcement").html(numToPlayer(player) + " to play!");
         } else {
             $("#play_announcement").html(numToPlayer((bidder + (bid.suit === "NT" ? 0 : 1)) % 4) + " to play!");
@@ -734,7 +728,7 @@ $("#prevplay").on('click', function () {
             card = tricks[trick].cards[play];
             player = card.player;
             $("#play_info").html(numToPlayer(player) +
-                " plays " + card.string() + "!").stop(true, true).show().fadeOut(1000);
+                " plays " + card.string() + "!").stop(true, true).css("opacity", 1).animate({opacity: 0}, 1000);
             if (currPlay % 5 === 4) {
                 $("#play_announcement").html("Determining winner...");
             } else {
@@ -778,7 +772,7 @@ $("#nextplay").on('click', function () {
                 $("#play" + trick + (player + 1)).css('font-style', 'italic');
             }
             $("#play_info").html(numToPlayer(player) +
-                " plays " + card.string() + "!").stop(true, true).show().fadeOut(1000);
+                " plays " + card.string() + "!").stop(true, true).css("opacity", 1).animate({opacity: 0}, 1000);
             $("#center" + player).html(card.string()).css('visibility', 'visible');
             $("#play_announcement").html(numToPlayer((player + 1) % 4) + " to play!");
             if (currPlay % 5 === 4) {
@@ -792,7 +786,7 @@ $("#nextplay").on('click', function () {
             }
             $("#play" + trick + (player + 1)).addClass("bg-success text-white");
             $("#play_info").html(numToPlayer(player) +
-                " takes the trick!").stop(true, true).show().fadeOut(1000);
+                " takes the trick!").stop(true, true).css("opacity", 1).animate({opacity: 0}, 1000);
             currTrick[player] += 1;
             $("#tricks_won" + player).html(currTrick[player]);
             if (currPlay === played * 5) {
@@ -839,7 +833,7 @@ $("#nexttrick").on('click', function () {
                 player = tricks[trick].winner;
                 $("#play" + trick + (player + 1)).addClass("bg-success text-white");
                 $("#play_info").html(numToPlayer(player) +
-                    " takes the trick!").stop(true, true).show().fadeOut(1000);
+                    " takes the trick!").stop(true, true).css("opacity", 1).animate({opacity: 0}, 1000);
                 currTrick[player] += 1;
                 $("#tricks_won" + player).html(currTrick[player]);
                 $("#play_announcement").html(numToPlayer(player) + " to play!");
@@ -901,6 +895,6 @@ $("#skipplay").on('click', function () {
             $("#center" + i).css('visibility', 'hidden');
         }
         $("#play_announcement").html(outcome());
-        $("#play_info").html("Skipped to end!").stop(true, true).fadeOut(1000);
+        $("#play_info").html("Skipped to end!").stop(true, true).css("opacity", 1).animate({opacity: 0}, 1000);
     }
 });

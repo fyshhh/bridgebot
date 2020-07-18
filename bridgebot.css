@@ -1,157 +1,115 @@
-body {
-  padding: 20px;
+#code_entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-#entire_play {
+#code_entry > h1 {
   text-align: center;
 }
 
-#row_top, #row_bot {
-  height: 100px;
+#code_entry > form > div {
   display: flex;
+  flex-direction: column;
   align-items: center;
 }
 
-#row_mid {
-  height: 520px;
+#valid_wrapper {
   display: flex;
+  flex-direction: column;
   align-items: center;
 }
 
-#row_mid > div {
-  height: 100%;
-  display: flex;
-  align-items: center;
+#valid {
+  text-align: center;
+}
+
+#viewer {
+  text-align: center;
 }
 
 #hand0, #hand2 {
-  text-align: center;
-}
-
-#bid_history {
-  text-align: center;
-  display:flex;
-  align-items:center;
-}
-
-#play_history {
-  text-align: center;
-  display:flex;
-  align-items:center;
-}
-
-.display_center {
-  height: 470px;
+  height: 100px;
   display: flex;
-  flex-wrap: wrap;
-}
-
-#play_center > div {
-  width: 100%;
-}
-
-#play_area_parent {
-  width: 100%;
-  height: 87%;
-  display: flex;
+  justify-content: center;
   align-items: center;
 }
 
-#play_area_parent > div {
-  width: 100%;
-  text-align: center;
-}
-
-#bid_area_parent {
-  width: 100%;
-  height: 87%;
+#hand1, #hand3 {
   display: flex;
+  justify-content: center;
   align-items: center;
-}
-
-#bid_area_parent > div {
-  width: 100%;
-  text-align: center;
-}
-
-#inner_play_area {
-  width: 100%
-  display: flex;
-  text-align: center;
-}
-
-#inner_play_area > div {
-  width: 100%;
-}
-
-#bid_area {
-  height: 100%;
-}
-
-#bid_area > table {
-  height: 100%;
-}
-
-#inner_row {
-  height: 340px;
-  align-items: center;
-}
-
-#tricks_won0 {
-  height: 30px;
-}
-
-#tricks_won2 {
-  height: 30px;
-}
-
-#bid0 {
-  padding-top: 80px;
-}
-
-#bid0, #bid2 {
-  padding-right: 30px;
-}
-
-#bid1 {
-  padding-right: 65px;
-}
-
-#bid1, #bid3 {
-  padding-top: 48px;
-}
-
-#bid_announcement {
-  padding-top: 48px;
-  padding-right: 30px;
-}
-
-#bid_nav_bar {
-  padding-top: 48px;
-  padding-left: 85px;
-}
-
-#play_nav_bar {
-  padding-left: 0px;
-  align-self: flex-end;
-}
-
-#stack {
-  width: 100%;
-  height: 100%;
-}
-
-#inner_grid {
-  width: 100%;
-  height: 100%;
 }
 
 #big_container {
-  padding-left: 60px;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
 }
 
-.replay {
-  display: none;
+#big_container > div {
+  width: 100%;
+}
+
+.display_center {
+  display: flex;
+  flex-direction: column;
+}
+
+.tricks_won {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav_bar_top {
+  display: flex;
+  flex-direction: row;
+  padding: 0px;
+}
+
+.nav_bar_bot {
+  display: flex;
+  flex-direction: row;
+  padding: 0px;
+}
+
+.history {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+html {
+  padding-bottom: 50px;
+}
+
+@media (min-width: 576px) {
+  #stack {
+    height: 297px;
+  }
+  .nav_bar_top {
+    justify-content: flex-end;
+  }
+  .nav_bar_bot {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 575px) {
+  #stack {
+    height: 297px;
+  }
+  .nav_bar_top, .nav_bar_bot {
+    justify-content: center;
+  }
+  .tricks_won {
+    display: none;
+  }
+}
+
+@media (max-width: 992px) {
+  #hand1, #hand3 {
+    height: 100px;
+  }
 }
