@@ -106,11 +106,11 @@ function Card(num, suit) {
         var temp = this.num;
         if (this.num === 10) {
             temp = "J";
-        } else if (num === 11) {
+        } else if (this.num === 11) {
             temp = "Q";
-        } else if (num === 12) {
+        } else if (this.num === 12) {
             temp = "K";
-        } else if (num === 13) {
+        } else if (this.num === 13) {
             temp = "A";
         } else {
             temp += 1;
@@ -125,6 +125,42 @@ function Card(num, suit) {
             temp += "&#9824;";
         }
         return temp;
+    };
+    this.pictureV = function () {
+        var temp = this.num,
+            fst = '<img src="media/vertical/',
+            snd = '.jpg" width="45px" height="60px" />';
+        if (this.num === 10) {
+            temp = "J";
+        } else if (this.num === 11) {
+            temp = "Q";
+        } else if (this.num === 12) {
+            temp = "K";
+        } else if (this.num === 13) {
+            temp = "A";
+        } else {
+            temp += 1;
+        }
+        temp += this.suit;
+        return fst + temp + snd;
+    };
+    this.pictureH = function () {
+        var temp = this.num,
+            fst = '<img src="media/horizontal/',
+            snd = '.jpg" width="60px" height="45px" />';
+        if (this.num === 10) {
+            temp = "J";
+        } else if (this.num === 11) {
+            temp = "Q";
+        } else if (this.num === 12) {
+            temp = "K";
+        } else if (this.num === 13) {
+            temp = "A";
+        } else {
+            temp += 1;
+        }
+        temp += this.suit;
+        return fst + temp + snd;
     };
     this.equals = function (card) {
         return this.num === card.num && this.suit === card.suit;
@@ -320,6 +356,26 @@ function computeHand(arr, index) {
     return "[" + str.substring(0, str.length - 2) + "]";
 }
 
+function computeHandV(arr, index) {
+    var i = 0,
+        str = "";
+    while (arr[index][i] !== undefined) {
+        str += arr[index][i].pictureV();
+        i += 1;
+    }
+    return str;
+}
+
+function computeHandH(arr, index) {
+    var i = 0,
+        str = "";
+    while (arr[index][i] !== undefined) {
+        str += arr[index][i].pictureH();
+        i += 1;
+    }
+    return str;
+}
+
 function remove(arr, num) {
     var index = arr.indexOf(num);
     if (index > -1) {
@@ -361,8 +417,19 @@ $("form").submit(function (event) {
         simulate();
         if (bidder !== partnerP) {
             for (i = 0; i < 4; i += 1) {
-                $("#hand" + i).html(computeHand(playersStart, i));
+                if (i % 2 === 0) {
+                    $("#hand" + i).html(computeHandV(playersStart, i));
+                } else {
+                    $("#hand" + i).html(computeHandH(playersStart, i));
+                }
                 $("#tricks_won" + i).html(0);
+            }
+            if ($(window).width() <= 974) {
+                $("#hand1").html(computeHandV(playersClone, 1));
+                $("#hand3").html(computeHandV(playersClone, 3));
+            } else {
+                $("#hand1").html(computeHandH(playersClone, 1));
+                $("#hand3").html(computeHandH(playersClone, 3));
             }
             $("#winning_bid").html("Winning bid: " + bid.string() +
                 " by " + numToPlayer(bidder));
@@ -390,6 +457,17 @@ $(window).on('load', function () {
         hash = hash.substring(1);
         $("#gamecode").val(hash);
         $("form").submit();
+    }
+});
+
+$(window).on('resize', function () {
+    var win = $(this);
+    if (win.width() <= 974) {
+        $("#hand1").html(computeHandV(playersClone, 1));
+        $("#hand3").html(computeHandV(playersClone, 3));
+    } else {
+        $("#hand1").html(computeHandH(playersClone, 1));
+        $("#hand3").html(computeHandH(playersClone, 3));
     }
 });
 
@@ -623,7 +701,11 @@ $("#restartplay").on('click', function () {
             for (j = 0; j < 13; j += 1) {
                 playersClone[i][j] = playersStart[i][j];
             }
-            $("#hand" + i).html(computeHand(playersClone, i));
+            if (i % 2 === 0) {
+                $("#hand" + i).html(computeHandV(playersClone, i));
+            } else {
+                $("#hand" + i).html(computeHandH(playersClone, i));
+            }
             $("#center" + i).css('visibility', 'hidden');
             currTrick[i] = 0;
             $("#tricks_won" + i).html(0);
@@ -658,7 +740,7 @@ $("#prevtrick").on('click', function () {
                 card = tricks[trick].cards[play];
                 player = card.player;
                 $("#play" + trick + (player + 1)).html("");
-                $("#center" + player).html(card.string()).css('visibility', 'hidden');
+                $("#center" + player).html(player % 2 === 0 ? card.pictureV() : card.pictureH()).css('visibility', 'hidden');
             } else {
                 trick = currPlay / 5 - 1;
                 player = tricks[trick].winner;
@@ -670,7 +752,11 @@ $("#prevtrick").on('click', function () {
             if (currPlay % 5 !== 4) {
                 playersClone[player].push(card);
                 playersClone[player].sort(compare);
-                $("#hand" + player).html(computeHand(playersClone, player));
+                if (player % 2 === 0) {
+                    $("#hand" + player).html(computeHandV(playersClone, player));
+                } else {
+                    $("#hand" + player).html(computeHandH(playersClone, player));
+                }
             }
         }
         if (currPlay !== 0) {
@@ -713,14 +799,18 @@ $("#prevplay").on('click', function () {
             for (i = 0; i < 4; i += 1) {
                 card = tricks[trick].cards[i];
                 player = card.player;
-                $("#center" + player).html(card.string()).css('visibility', 'visible');
+                $("#center" + player).html(player % 2 === 0 ? card.pictureV() : card.pictureH()).css('visibility', 'visible');
             }
         }
         currPlay -= 1;
         if (currPlay % 5 !== 4) {
             playersClone[player].push(card);
             playersClone[player].sort(compare);
-            $("#hand" + player).html(computeHand(playersClone, player));
+            if (player % 2 === 0) {
+                $("#hand" + player).html(computeHandV(playersClone, player));
+            } else {
+                $("#hand" + player).html(computeHandH(playersClone, player));
+            }
         }
         if (currPlay % 5 !== 0) {
             play = currPlay % 5 - 1;
@@ -738,7 +828,7 @@ $("#prevplay").on('click', function () {
             trick = currPlay / 5 - 1;
             player = tricks[trick].winner;
             $("#play_info").html(numToPlayer(player) +
-                " takes the trick!").stop(true, true).show().fadeOut(1000);
+                " takes the trick!").stop(true, true).css("opacity", 1).animate({opacity: 0}, 1000);
             $("#play_announcement").html(numToPlayer(player) + " to play!");
         } else {
             $("#play_announcement").html(numToPlayer((bidder + (bid.suit === "NT" ? 0 : 1)) % 4) + " to play!");
@@ -766,14 +856,18 @@ $("#nextplay").on('click', function () {
             card = tricks[trick].cards[play];
             player = card.player;
             removeCard(playersClone[player], card);
-            $("#hand" + player).html(computeHand(playersClone, player));
+            if (player % 2 === 0) {
+                $("#hand" + player).html(computeHandV(playersClone, player));
+            } else {
+                $("#hand" + player).html(computeHandH(playersClone, player));
+            }
             $("#play" + trick + (player + 1)).html(card.string());
             if (card.equals(partnerC)) {
                 $("#play" + trick + (player + 1)).css('font-style', 'italic');
             }
             $("#play_info").html(numToPlayer(player) +
                 " plays " + card.string() + "!").stop(true, true).css("opacity", 1).animate({opacity: 0}, 1000);
-            $("#center" + player).html(card.string()).css('visibility', 'visible');
+            $("#center" + player).html(player % 2 === 0 ? card.pictureV() : card.pictureH()).css('visibility', 'visible');
             $("#play_announcement").html(numToPlayer((player + 1) % 4) + " to play!");
             if (currPlay % 5 === 4) {
                 $("#play_announcement").html("Determining winner...");
@@ -823,7 +917,11 @@ $("#nexttrick").on('click', function () {
                 card = tricks[trick].cards[play];
                 player = card.player;
                 removeCard(playersClone[player], card);
-                $("#hand" + player).html(computeHand(playersClone, player));
+                if (player % 2 === 0) {
+                    $("#hand" + player).html(computeHandV(playersClone, player));
+                } else {
+                    $("#hand" + player).html(computeHandH(playersClone, player));
+                }
                 $("#play" + trick + (player + 1)).html(card.string());
                 if (card.equals(partnerC)) {
                     $("#play" + trick + (player + 1)).css('font-style', 'italic');
@@ -889,7 +987,11 @@ $("#skipplay").on('click', function () {
             for (j = 0; j < 13 - played; j += 1) {
                 playersClone[i][j] = playersEnd[i][j];
             }
-            $("#hand" + i).html(computeHand(playersClone, i));
+            if (i % 2 === 0) {
+                $("#hand" + i).html(computeHandV(playersClone, i));
+            } else {
+                $("#hand" + i).html(computeHandH(playersClone, i));
+            }
         }
         for (i = 0; i < 4; i += 1) {
             $("#center" + i).css('visibility', 'hidden');
