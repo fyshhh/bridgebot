@@ -36,6 +36,7 @@ use this code: 0CDzG-Y-kmcaNMAEXpqSvyhnoUJLBYzCGswlkdbHIKOuxQRWefjiDFPTrVZgt
 "use strict";
 
 var i,
+    j,
     bid,
     input,
     inputA,
@@ -423,6 +424,16 @@ $("form").submit(function (event) {
                     $("#hand" + i).html(computeHandH(playersStart, i));
                 }
                 $("#tricks_won" + i).html(0);
+                $("#bid" + i).html("");
+                $("#center" + i).html("");
+                for (j = 0; j < 13; j += 1) {
+                    if (j < 7) {
+                        $("#bid" + j + (i + 1)).html("").removeClass("bg-success text-white");
+                    }
+                    $("#play" + j + (i + 1)).html("").removeClass("bg-success text-white");
+                    $("#bid_row" + j).removeClass("bg-light").addClass("bg-secondary text-muted");
+                    $("#play_row" + j).removeClass("bg-light").addClass("bg-secondary text-muted");
+                }
             }
             if ($(window).width() <= 974) {
                 $("#hand1").html(computeHandV(playersClone, 1));
@@ -443,6 +454,10 @@ $("form").submit(function (event) {
             $("#bid_center").show();
             $("#play_history").hide();
             $("#play_center").hide();
+            if (!$("#bid_toggle").hasClass("active")) {
+                $("#bid_toggle").addClass("active");
+                $("#play_toggle").removeClass("active");
+            }
             return false;
         }
         $("#valid").html("Invalid code - partner card is held by bidder.").show();
