@@ -13,10 +13,12 @@
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <!-- BridgeBot stylesheet -->
     <link rel="stylesheet" type="text/css" href="bridgebot.css">
+    <!-- Nice color palette -->
+    <link rel=stylesheet href="https://s3-us-west-2.amazonaws.com/colors-css/2.2.0/colors.min.css">
     <!-- Browser icon -->
     <link rel="icon" href="media/favicon.ico">
     <!-- Popper JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js">
+    <script src="https://unpkg.com/@popperjs/core@2">
     </script>
   </head>
   <body>
@@ -30,22 +32,22 @@
       </form>
     </div>
     <div id="valid_wrapper">
-      <span id="valid"></span>
+      <span id="valid" class="text-danger"></span>
     </div>
     <div id="viewer" class="container_fluid">
       <div class="row" style="width: 100%">
         <div id="entire_play" class="replay col-lg-9">
           <div class="row">
-            <div id="hand3" class="col-lg-2 border border-success rounded-pill"></div>
+            <div id="hand3" class="col-lg-2 shadow-lg bg-olive border-top border-left border-bottom border-dark"></div>
             <div class="col-lg-8">
               <div id="row_top" class="row">
-                <div id="hand0" class="col-lg-12 border border-danger rounded-pill"></div>
+                <div id="hand0" class="col-lg-12 shadow-lg bg-olive border-top border-dark"></div>
               </div>
               <div id="row_mid" class="row">
                 <div id="big_container" class="col-lg-12">
                   <div class="row">
                     <div class="col-sm-12">
-                      <ul class="nav nav-pills nav-justified">
+                      <ul class="nav nav-pills nav-justified nav-fill">
                         <li class="nav-item">
                           <button id="bid_toggle" class="btn btn-outline-info active">Bids</a>
                         </li>
@@ -190,10 +192,10 @@
                 </div>
               </div>
               <div id="row_bot" class="row">
-                <div id="hand2" class="col-lg-12 border border-warning rounded-pill"></div>
+                <div id="hand2" class="col-lg-12 shadow-lg bg-olive border-bottom border-dark"></div>
               </div>
             </div>
-            <div id="hand1" class="col-lg-2 border border-primary rounded-pill"></div>
+            <div id="hand1" class="col-lg-2 shadow-lg bg-olive border-top border-bottom border-right border-dark"></div>
           </div>
         </div>
         <div id="bid_history" class="replay col-lg-3 history">

@@ -118,6 +118,12 @@ html {
 }
 
 @media (max-width: 992px) {
+  #hand0, #hand2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+  }
   #hand1, #hand3 {
     height: 100px;
     flex-direction: row;

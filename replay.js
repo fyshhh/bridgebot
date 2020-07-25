@@ -27,7 +27,10 @@ Changelog:
 280620: Finished entirety of bid support. Ready for Milestone 2 deployment. (4h)
 060720: Prototyped new mobile-friendly site (4h).
 100720: Worked on mobile-friendly site (3h).
-110720: Finished mobile-friendly site (3h).
+110720: Worked on mobile-friendly site (3h).
+220720: add like what a few days inside, say add picture add favicon more bug fixes
+
+hand0 and hand2 are fked need to fix.
 
 use this code: 0CDzG-Y-kmcaNMAEXpqSvyhnoUJLBYzCGswlkdbHIKOuxQRWefjiDFPTrVZgt
 
