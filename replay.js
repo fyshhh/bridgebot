@@ -480,12 +480,21 @@ $(window).on('load', function () {
 
 $(window).on('resize', function () {
     var win = $(this);
-    if (win.width() <= 974) {
-        $("#hand1").html(computeHandV(playersClone, 1));
-        $("#hand3").html(computeHandV(playersClone, 3));
+    if (win.width() <= 652) {
+        $("#hand0").html(computeHand(playersClone, 0));
+        $("#hand1").html(computeHand(playersClone, 1));
+        $("#hand2").html(computeHand(playersClone, 2));
+        $("#hand3").html(computeHand(playersClone, 3));
+    } else if (win.width() <= 974) {
+        $("#hand0").html(computeHandV(playersClone, 0)).addClass("border");
+        $("#hand1").html(computeHandV(playersClone, 1)).addClass("border");
+        $("#hand2").html(computeHandV(playersClone, 2)).addClass("border");
+        $("#hand3").html(computeHandV(playersClone, 3)).addClass("border");
     } else {
-        $("#hand1").html(computeHandH(playersClone, 1));
-        $("#hand3").html(computeHandH(playersClone, 3));
+        $("#hand0").html(computeHandV(playersClone, 0)).removeClass("border");
+        $("#hand1").html(computeHandH(playersClone, 1)).removeClass("border");
+        $("#hand2").html(computeHandV(playersClone, 2)).removeClass("border");
+        $("#hand3").html(computeHandH(playersClone, 3)).removeClass("border");
     }
 });
 
@@ -589,7 +598,7 @@ $("#nextbid").on('click', function () {
             }
             currBid += 1;
             $("#bid_announcement").html(numToPlayer(bidder) + " wins the bid!");
-            $("#bid" + (bidder === 0 ? row : row - 1) + (bidder + 1)).addClass("bg-success text-white");
+            $("#bid" + (bidder === bidStarter ? row : row - 1) + (bidder + 1)).addClass("bg-success text-white");
         } else {
             $("#bid" + ((bidStarter + currBid) % 4)).html(charToBid("z".charCodeAt()).string());
             $("#bid" + row + ((bidStarter + currBid) % 4 + 1)).html(charToBid("z".charCodeAt()).string());
@@ -627,7 +636,7 @@ $("#next4bid").on('click', function () {
                     }
                     currBid += 1;
                     $("#bid_announcement").html(numToPlayer(bidder) + " wins the bid!");
-                    $("#bid" + (bidder === 0 ? row : row - 1) + (bidder + 1)).addClass("bg-success text-white");
+                    $("#bid" + (bidder === bidStarter ? row : row - 1) + (bidder + 1)).addClass("bg-success text-white");
                 } else {
                     $("#bid" + ((bidStarter + currBid) % 4)).html(charToBid("z".charCodeAt()).string());
                     $("#bid" + row + ((bidStarter + currBid) % 4 + 1)).html(charToBid("z".charCodeAt()).string());
@@ -667,7 +676,7 @@ $("#skipbid").on('click', function () {
                     }
                     currBid += 1;
                     $("#bid_announcement").html(numToPlayer(bidder) + " wins the bid!");
-                    $("#bid" + (bidder === 0 ? row : row - 1) + (bidder + 1)).addClass("bg-success text-white");
+                    $("#bid" + (bidder === bidStarter ? row : row - 1) + (bidder + 1)).addClass("bg-success text-white");
                 } else {
                     $("#bid" + ((bidStarter + currBid) % 4)).html(charToBid("z".charCodeAt()).string());
                     $("#bid" + row + ((bidStarter + currBid) % 4 + 1)).html(charToBid("z".charCodeAt()).string());
