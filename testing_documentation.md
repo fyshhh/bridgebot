@@ -1,7 +1,7 @@
 # Testing Documentation
 
 Below is a documentation of the different testing methodologies employed to ensure the website is working properly. Because the website can be tested easily by a single person,
-all the testing done was by me.
+all the testing done was by us.
 
 ## Internal Testing
 To understand how testing is done, we must first understand how the website operates.
@@ -43,3 +43,9 @@ code to change the relevant elements. Although there were a total of 14 buttons,
 simply the 'Next Play' button, but executed to a maximum of 5 times depending on how many players had played), and thus testing was simply conducted on the buttons that had
 been the root of the design ('Previous/Next Bid', 'Previous/Next Trick', 'Show Bids/Plays'). These buttons were tested by, again, changing the code and ensuring that the
 correct information was shown.
+
+#### Overall Site Integrity
+
+The final part to test was the entirety of the website, to ensure that it provided a good user experience. For that, we've experimented with multiple codes generated from
+actual Bridge games, with varying bids and plays. We had also tried to input multiple codes into a static session to ensure that all the information was updated correctly.
+Finally, we had tested the site with varying viewports to find the best layout for each screen size.
